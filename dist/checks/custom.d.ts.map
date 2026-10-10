@@ -1,0 +1,1 @@
+{"version":3,"file":"custom.d.ts","sourceRoot":"","sources":["../../src/checks/custom.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,WAAW,EAAE,aAAa,EAAE,MAAM,mBAAmB,CAAC;AACpE,OAAO,KAAK,EAAE,sBAAsB,EAAE,MAAM,qBAAqB,CAAC;AAGlE,wBAAgB,cAAc,CAC5B,OAAO,EAAE,aAAa,EACtB,KAAK,EAAE,sBAAsB,CAAC,aAAa,CAAC,GAC3C,WAAW,EAAE,CAkGf"}

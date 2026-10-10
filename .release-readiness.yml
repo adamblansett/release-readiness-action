@@ -1,0 +1,105 @@
+# Release Readiness Action Configuration
+# Documentation: https://github.com/adamblansett/release-readiness-action
+
+# Severity threshold to fail the workflow: 'error', 'warning', or 'never'
+failOn: error
+
+# Whether exposed secrets immediately fail evaluation regardless of failOn
+failOnSecrets: true
+
+# Project structure checks
+structure:
+  checkReadme: true
+  checkLicense: true
+  checkChangelog: false
+  checkSecurityPolicy: false
+  checkContributing: false
+  checkCodeowners: false
+  checkCiWorkflow: true
+  checkReleaseNotes: false
+  requiredFiles: []
+  requiredDirectories: []
+
+# Documentation validation
+documentation:
+  minFileSizeBytes: 20
+  disallowPlaceholders: true
+  placeholderPatterns:
+    - 'TODO'
+    - 'FIXME'
+    - 'LOREM IPSUM'
+    - '[PROJECT NAME]'
+    - '<INSERT'
+    - 'CHANGEME'
+
+# Package metadata checks (for Node.js/TypeScript projects)
+packageMetadata:
+  enabled: true
+  requireName: true
+  requireVersion: true
+  requireDescription: false
+  requireLicense: true
+  requireRepository: false
+  validateSemver: true
+  validateEntryPoints: true
+  validateFilesWhitelist: true
+  checkTagVersionMatch: false
+
+# Scripts & Build validation
+# Safe default: execute is false unless explicitly enabled in workflow inputs
+scripts:
+  execute: false
+  requiredScripts:
+    - test
+    - build
+  timeoutMs: 60000
+
+# Local secret scanning
+secrets:
+  enabled: true
+  maxFileSizeKb: 512
+  excludePaths:
+    - 'node_modules/**'
+    - 'dist/**'
+    - 'build/**'
+    - '.git/**'
+    - 'coverage/**'
+    - 'tests/**'
+    - '*.lock'
+    - 'package-lock.json'
+    - '*.png'
+    - '*.jpg'
+    - '*.jpeg'
+    - '*.gif'
+    - '*.svg'
+    - '*.ico'
+    - '*.pdf'
+  includeUntracked: true
+
+# Dependency checks
+dependencies:
+  checkLockfile: true
+  checkMultipleLockfiles: true
+  # Safe default: audit requires network, disabled by default
+  audit: false
+  auditLevel: high
+
+# Git working tree checks
+git:
+  checkUncommitted: false
+  checkBranch: false
+  allowedBranches:
+    - main
+    - master
+    - 'release/*'
+
+# Release checklist verification
+checklist:
+  requireAllCompleted: true
+  requiredItems: []
+
+# Reporting configuration
+reporting:
+  format: all
+  annotateGitHub: true
+  createSummary: true

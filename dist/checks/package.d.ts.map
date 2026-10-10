@@ -1,0 +1,1 @@
+{"version":3,"file":"package.d.ts","sourceRoot":"","sources":["../../src/checks/package.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,WAAW,EAAE,aAAa,EAAE,MAAM,mBAAmB,CAAC;AACpE,OAAO,KAAK,EAAE,sBAAsB,EAAE,MAAM,qBAAqB,CAAC;AAWlE,wBAAsB,gBAAgB,CACpC,OAAO,EAAE,aAAa,EACtB,MAAM,EAAE,sBAAsB,CAAC,iBAAiB,CAAC,GAChD,OAAO,CAAC,WAAW,EAAE,CAAC,CAyTxB"}

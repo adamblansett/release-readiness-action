@@ -1,0 +1,76 @@
+name: 'Release Readiness Action'
+description: 'Evaluate whether a software project satisfies release-readiness requirements before release or deployment.'
+author: 'Adam Blansett'
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  config-path:
+    description: 'Path to configuration file (.release-readiness.yml, .release-readiness.json)'
+    required: false
+  working-directory:
+    description: 'Root directory of the project to evaluate'
+    required: false
+    default: '.'
+  fail-on:
+    description: 'Minimum severity level to fail the action: error, warning, or never'
+    required: false
+    default: 'error'
+  fail-on-secrets:
+    description: 'Whether any detected secret causes immediate failure regardless of fail-on'
+    required: false
+    default: 'true'
+  execute-scripts:
+    description: 'Explicit opt-in to execute configured validation scripts (e.g. test, lint, build)'
+    required: false
+    default: 'false'
+  scripts-to-run:
+    description: 'Comma-separated list of scripts to execute when execute-scripts is enabled'
+    required: false
+  check-secrets:
+    description: 'Enable local repository secret scanning'
+    required: false
+    default: 'true'
+  check-uncommitted:
+    description: 'Check for dirty git state or uncommitted changes'
+    required: false
+    default: 'false'
+  check-tag-version:
+    description: 'Verify git tag matches package version (e.g. in release tag workflows)'
+    required: false
+    default: 'false'
+  audit-dependencies:
+    description: 'Run npm audit dependency security check (requires network)'
+    required: false
+    default: 'false'
+  output-format:
+    description: 'Report output format: all, markdown, json, or console'
+    required: false
+    default: 'all'
+  create-summary:
+    description: 'Emit GFM report into GitHub Step Summary'
+    required: false
+    default: 'true'
+  annotate-github:
+    description: 'Emit inline GitHub Action PR annotations for errors and warnings'
+    required: false
+    default: 'true'
+
+outputs:
+  passed:
+    description: 'Whether all release readiness criteria passed (true/false)'
+  findings-count:
+    description: 'Total number of findings identified'
+  errors-count:
+    description: 'Count of error-level findings'
+  warnings-count:
+    description: 'Count of warning-level findings'
+  report-json:
+    description: 'Structured JSON evaluation report'
+  report-markdown:
+    description: 'Markdown summary of the evaluation report'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

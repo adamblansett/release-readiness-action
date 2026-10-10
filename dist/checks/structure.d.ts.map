@@ -1,0 +1,1 @@
+{"version":3,"file":"structure.d.ts","sourceRoot":"","sources":["../../src/checks/structure.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,WAAW,EAAE,aAAa,EAAE,MAAM,mBAAmB,CAAC;AACpE,OAAO,KAAK,EAAE,sBAAsB,EAAE,MAAM,qBAAqB,CAAC;AAElE,wBAAgB,kBAAkB,CAChC,OAAO,EAAE,aAAa,EACtB,MAAM,EAAE,sBAAsB,CAAC,WAAW,CAAC,GAC1C,WAAW,EAAE,CAySf"}

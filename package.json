@@ -1,0 +1,80 @@
+{
+  "name": "release-readiness-action",
+  "version": "1.0.0",
+  "description": "Configurable GitHub Action and developer CLI to evaluate software release-readiness before release or deployment.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "release-readiness": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "action.yml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:bundle": "node scripts/bundle.mjs",
+    "build": "npm run build:types && npm run build:bundle",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "verify": "npm run lint && npm run typecheck && npm run format:check && npm run test && npm run build",
+    "prepack": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adamblansett/release-readiness-action.git"
+  },
+  "keywords": [
+    "github-action",
+    "release-readiness",
+    "devsecops",
+    "ci-cd",
+    "quality-gate",
+    "pre-release",
+    "secret-scanning",
+    "compliance",
+    "automation"
+  ],
+  "author": "Adam Blansett <https://adamblansett.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adamblansett/release-readiness-action/issues"
+  },
+  "homepage": "https://github.com/adamblansett/release-readiness-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "commander": "^13.1.0",
+    "picocolors": "^1.1.1",
+    "yaml": "^2.7.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/node": "^22.13.5",
+    "@vitest/coverage-v8": "^3.2.7",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.21.0",
+    "prettier": "^3.5.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.1",
+    "vitest": "^3.0.7"
+  }
+}
