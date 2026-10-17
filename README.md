@@ -277,6 +277,28 @@ npm run verify
 
 ---
 
+## ⚖️ Legal Disclaimer & Limitation of Liability
+
+### 1. "AS IS" and Express Warranty Disclaimer
+This software, documentation, GitHub Action workflows, and automated release verification checks are provided on an **"AS IS"** and **"AS AVAILABLE"** basis, **WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND**, either express, implied, statutory, or otherwise. To the maximum extent permitted by applicable law, the author, copyright holders, and contributors expressly disclaim all warranties, including but not limited to implied warranties of merchantability, fitness for a particular purpose, title, quiet enjoyment, and non-infringement.
+
+### 2. CI/CD Deployment Gating & Production Non-Liability
+- **Assistance Tool Only:** `release-readiness-action` is an automated verification assistant designed to enforce configurable release checklist gates within continuous integration and continuous deployment (CI/CD) pipelines.
+- **No Production Reliability Guarantee:** The passage of all release readiness checks does **not** guarantee that software is free from defects, security vulnerabilities, memory leaks, performance bottlenecks, or regulatory non-compliance. Passing checks shall not be construed as a warranty of production fitness.
+- **Pipeline Interruption & Deployment Delays:** The author and contributors accept no liability for deployment delays, blocked release pipelines, missed deadlines, or false positive/negative check results that either impede hotfixes or allow defective artifacts to be published.
+
+### 3. Secret & Credential Scanning Limitations
+- The secret scanner module utilizes heuristic regular expression matching to detect potential credential leaks. It is **not** an exhaustive security solution and cannot detect all possible secrets, encrypted payloads, proprietary tokens, or custom credentials.
+- Users remain solely responsible for comprehensive application security, credential rotation, and enterprise secret management.
+
+### 4. Limitation of Liability
+To the maximum extent permitted by applicable law, **IN NO EVENT SHALL THE AUTHOR, COPYRIGHT HOLDERS, OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE, OR CONSEQUENTIAL DAMAGES** (including, but not limited to, loss of use, data, revenue, profits, business, or goodwill; deployment downtime; pipeline failures; failed releases; data breaches; or procurement of substitute goods or services), however caused and on any theory of liability, whether in contract, strict liability, tort (including negligence or otherwise), or statute, arising in any way out of the use, reproduction, modification, distribution, or reliance upon this software, even if advised of the possibility of such damages.
+
+### 5. Third-Party Trademarks & Non-Affiliation
+All product names, logos, brands, and registered trademarks mentioned within this project (including GitHub, GitHub Actions, Node.js, and Vitest) are the property of their respective owners. Mention of these entities does not imply endorsement, sponsorship, or affiliation with the author.
+
+---
+
 ## 📄 License
 
 This project is open-source software licensed under the [MIT License](LICENSE).
