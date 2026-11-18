@@ -36,6 +36,17 @@ describe('Configuration System', () => {
         });
       }).toThrow();
     });
+
+    it('rejects oversized array inputs to prevent memory exhaustion', () => {
+      const oversizedArray = new Array(501).fill('file.txt');
+      expect(() => {
+        ReleaseReadinessConfigSchema.parse({
+          structure: {
+            requiredFiles: oversizedArray,
+          },
+        });
+      }).toThrow();
+    });
   });
 
   describe('deepMerge', () => {

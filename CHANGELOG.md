@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-11-18
+
+### Security & Hardening
+
+- Hardened Zod configuration schemas with bounded limits on string and array collection lengths to prevent memory exhaustion and collection expansion denial-of-service.
+- Pinned secure dependency overrides (`@fastify/busboy`, `picomatch`, `tinypool`, `minimatch`, `glob`, `undici`) to remediate security advisories.
+- Enforced automated verification with Vitest suite (75 tests passing) and code style standards.
+
 ## [1.0.0] - 2026-10-10
 
 ### Added

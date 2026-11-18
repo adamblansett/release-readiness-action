@@ -1,33 +1,33 @@
 import { z } from 'zod';
 
 export const CustomRuleSchema = z.object({
-  id: z.string().min(1, 'Rule ID is required'),
-  name: z.string().min(1, 'Rule name is required'),
-  file: z.string().min(1, 'Target file is required'),
+  id: z.string().min(1, 'Rule ID is required').max(100),
+  name: z.string().min(1, 'Rule name is required').max(200),
+  file: z.string().min(1, 'Target file is required').max(1024),
   mustExist: z.boolean().optional(),
-  pattern: z.string().optional(),
-  forbiddenPattern: z.string().optional(),
-  message: z.string().optional(),
+  pattern: z.string().max(4096).optional(),
+  forbiddenPattern: z.string().max(4096).optional(),
+  message: z.string().max(2048).optional(),
   severity: z.enum(['error', 'warning', 'info']).default('error'),
 });
 
 export const ScriptCommandSchema = z.object({
-  name: z.string().min(1, 'Command name is required'),
-  command: z.string().min(1, 'Command executable is required'),
-  args: z.array(z.string()).default([]),
-  timeoutMs: z.number().int().positive().default(60000),
+  name: z.string().min(1, 'Command name is required').max(100),
+  command: z.string().min(1, 'Command executable is required').max(512),
+  args: z.array(z.string().max(4096)).max(200).default([]),
+  timeoutMs: z.number().int().positive().max(3600000).default(60000),
   required: z.boolean().default(true),
 });
 
 export const RequiredDocSchema = z.object({
-  path: z.string().min(1, 'Document path is required'),
+  path: z.string().min(1, 'Document path is required').max(1024),
   minSize: z.number().int().nonnegative().optional(),
-  title: z.string().optional(),
+  title: z.string().max(200).optional(),
 });
 
 export const SecretPatternSchema = z.object({
-  name: z.string().min(1, 'Secret pattern name is required'),
-  pattern: z.string().min(1, 'Regex pattern is required'),
+  name: z.string().min(1, 'Secret pattern name is required').max(100),
+  pattern: z.string().min(1, 'Regex pattern is required').max(4096),
 });
 
 export const ReleaseReadinessConfigSchema = z
@@ -46,8 +46,8 @@ export const ReleaseReadinessConfigSchema = z
         checkCodeowners: z.boolean().default(false),
         checkCiWorkflow: z.boolean().default(true),
         checkReleaseNotes: z.boolean().default(false),
-        requiredFiles: z.array(z.string()).default([]),
-        requiredDirectories: z.array(z.string()).default([]),
+        requiredFiles: z.array(z.string().max(1024)).max(500).default([]),
+        requiredDirectories: z.array(z.string().max(1024)).max(500).default([]),
       })
       .default({}),
 
@@ -56,7 +56,8 @@ export const ReleaseReadinessConfigSchema = z
         minFileSizeBytes: z.number().int().nonnegative().default(20),
         disallowPlaceholders: z.boolean().default(true),
         placeholderPatterns: z
-          .array(z.string())
+          .array(z.string().max(1024))
+          .max(200)
           .default([
             'TODO',
             'FIXME',
@@ -67,7 +68,7 @@ export const ReleaseReadinessConfigSchema = z
             'REPLACE_ME',
             'COMING SOON',
           ]),
-        requiredDocs: z.array(RequiredDocSchema).default([]),
+        requiredDocs: z.array(RequiredDocSchema).max(500).default([]),
       })
       .default({}),
 
@@ -89,8 +90,8 @@ export const ReleaseReadinessConfigSchema = z
     scripts: z
       .object({
         execute: z.boolean().default(false),
-        requiredScripts: z.array(z.string()).default([]),
-        commands: z.array(ScriptCommandSchema).default([]),
+        requiredScripts: z.array(z.string().max(1024)).max(200).default([]),
+        commands: z.array(ScriptCommandSchema).max(100).default([]),
         timeoutMs: z.number().int().positive().default(60000),
         maxOutputBytes: z.number().int().positive().default(1048576), // 1MB
       })
@@ -101,7 +102,8 @@ export const ReleaseReadinessConfigSchema = z
         enabled: z.boolean().default(true),
         maxFileSizeKb: z.number().int().positive().default(512),
         excludePaths: z
-          .array(z.string())
+          .array(z.string().max(1024))
+          .max(500)
           .default([
             'node_modules/**',
             'dist/**',
@@ -125,7 +127,7 @@ export const ReleaseReadinessConfigSchema = z
             '*.mp4',
           ]),
         includeUntracked: z.boolean().default(true),
-        additionalPatterns: z.array(SecretPatternSchema).default([]),
+        additionalPatterns: z.array(SecretPatternSchema).max(200).default([]),
       })
       .default({}),
 
@@ -142,7 +144,10 @@ export const ReleaseReadinessConfigSchema = z
       .object({
         checkUncommitted: z.boolean().default(false),
         checkBranch: z.boolean().default(false),
-        allowedBranches: z.array(z.string()).default(['main', 'master', 'release/*']),
+        allowedBranches: z
+          .array(z.string().max(1024))
+          .max(100)
+          .default(['main', 'master', 'release/*']),
       })
       .default({}),
 
@@ -150,7 +155,7 @@ export const ReleaseReadinessConfigSchema = z
       .object({
         checklistFile: z.string().optional(),
         requireAllCompleted: z.boolean().default(true),
-        requiredItems: z.array(z.string()).default([]),
+        requiredItems: z.array(z.string().max(1024)).max(500).default([]),
       })
       .default({}),
 
@@ -164,7 +169,7 @@ export const ReleaseReadinessConfigSchema = z
       })
       .default({}),
 
-    customRules: z.array(CustomRuleSchema).default([]),
+    customRules: z.array(CustomRuleSchema).max(500).default([]),
   })
   .strict(); // Strict mode ensures unknown configuration options fail safely and are not ignored
 

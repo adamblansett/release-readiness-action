@@ -1,6 +1,6 @@
 {
   "name": "release-readiness-action",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Configurable GitHub Action and developer CLI to evaluate software release-readiness before release or deployment.",
   "type": "module",
   "main": "./dist/index.js",
@@ -64,7 +64,15 @@
     "commander": "^13.1.0",
     "picocolors": "^1.1.1",
     "yaml": "^2.7.0",
-    "zod": "^3.24.2"
+    "zod": "^3.25.76"
+  },
+  "overrides": {
+    "@fastify/busboy": "^3.2.6",
+    "picomatch": "^4.0.7",
+    "tinypool": "^2.2.0",
+    "minimatch": "^11.0.9",
+    "glob": "^14.0.6",
+    "undici": "^6.29.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

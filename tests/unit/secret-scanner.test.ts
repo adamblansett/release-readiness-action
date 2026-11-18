@@ -83,8 +83,18 @@ MIIEowIBAAKCAQEA0syntheticKeyContentForTestingPurposesOnly1234567890
     });
 
     it('detects Slack tokens and webhooks', () => {
-      const slackToken = ['xoxb', '1234567890', '1234567890123', 'abcdefghijklmnopqrstuvwx'].join('-');
-      const slackWebhook = ['https:', '', 'hooks.slack.com', 'services', 'T12345678', 'B123456789', '1234567890abcdef12345678'].join('/');
+      const slackToken = ['xoxb', '1234567890', '1234567890123', 'abcdefghijklmnopqrstuvwx'].join(
+        '-',
+      );
+      const slackWebhook = [
+        'https:',
+        '',
+        'hooks.slack.com',
+        'services',
+        'T12345678',
+        'B123456789',
+        '1234567890abcdef12345678',
+      ].join('/');
       const mockContext = createMockContext({
         'src/notifications.ts': `
     const slackBot = "${slackToken}";
@@ -159,10 +169,14 @@ const sample = "000000000000000000000000";
     });
 
     it('ignores .example and .template configuration files', () => {
-      const exampleSlackToken = ['xoxb', '1234567890', '1234567890123', 'abcdefghijklmnopqrstuvwx'].join('-');
+      const exampleSlackToken = [
+        'xoxb',
+        '1234567890',
+        '1234567890123',
+        'abcdefghijklmnopqrstuvwx',
+      ].join('-');
       const mockContext = createMockContext({
-        '.env.example':
-          `API_KEY=AKIAIOSFODNN7EXAMPLE\nSECRET=ghp_1234567890abcdefghijklmnopqrstuvwxyzAB\nSLACK_TOKEN=${exampleSlackToken}\n`,
+        '.env.example': `API_KEY=AKIAIOSFODNN7EXAMPLE\nSECRET=ghp_1234567890abcdefghijklmnopqrstuvwxyzAB\nSLACK_TOKEN=${exampleSlackToken}\n`,
         'config.template.json': JSON.stringify({ token: exampleSlackToken }),
       });
 

@@ -14804,30 +14804,30 @@ var NEVER = INVALID;
 
 // src/config/schema.ts
 var CustomRuleSchema = external_exports.object({
-  id: external_exports.string().min(1, "Rule ID is required"),
-  name: external_exports.string().min(1, "Rule name is required"),
-  file: external_exports.string().min(1, "Target file is required"),
+  id: external_exports.string().min(1, "Rule ID is required").max(100),
+  name: external_exports.string().min(1, "Rule name is required").max(200),
+  file: external_exports.string().min(1, "Target file is required").max(1024),
   mustExist: external_exports.boolean().optional(),
-  pattern: external_exports.string().optional(),
-  forbiddenPattern: external_exports.string().optional(),
-  message: external_exports.string().optional(),
+  pattern: external_exports.string().max(4096).optional(),
+  forbiddenPattern: external_exports.string().max(4096).optional(),
+  message: external_exports.string().max(2048).optional(),
   severity: external_exports.enum(["error", "warning", "info"]).default("error")
 });
 var ScriptCommandSchema = external_exports.object({
-  name: external_exports.string().min(1, "Command name is required"),
-  command: external_exports.string().min(1, "Command executable is required"),
-  args: external_exports.array(external_exports.string()).default([]),
-  timeoutMs: external_exports.number().int().positive().default(6e4),
+  name: external_exports.string().min(1, "Command name is required").max(100),
+  command: external_exports.string().min(1, "Command executable is required").max(512),
+  args: external_exports.array(external_exports.string().max(4096)).max(200).default([]),
+  timeoutMs: external_exports.number().int().positive().max(36e5).default(6e4),
   required: external_exports.boolean().default(true)
 });
 var RequiredDocSchema = external_exports.object({
-  path: external_exports.string().min(1, "Document path is required"),
+  path: external_exports.string().min(1, "Document path is required").max(1024),
   minSize: external_exports.number().int().nonnegative().optional(),
-  title: external_exports.string().optional()
+  title: external_exports.string().max(200).optional()
 });
 var SecretPatternSchema = external_exports.object({
-  name: external_exports.string().min(1, "Secret pattern name is required"),
-  pattern: external_exports.string().min(1, "Regex pattern is required")
+  name: external_exports.string().min(1, "Secret pattern name is required").max(100),
+  pattern: external_exports.string().min(1, "Regex pattern is required").max(4096)
 });
 var ReleaseReadinessConfigSchema = external_exports.object({
   workingDirectory: external_exports.string().default("."),
@@ -14842,13 +14842,13 @@ var ReleaseReadinessConfigSchema = external_exports.object({
     checkCodeowners: external_exports.boolean().default(false),
     checkCiWorkflow: external_exports.boolean().default(true),
     checkReleaseNotes: external_exports.boolean().default(false),
-    requiredFiles: external_exports.array(external_exports.string()).default([]),
-    requiredDirectories: external_exports.array(external_exports.string()).default([])
+    requiredFiles: external_exports.array(external_exports.string().max(1024)).max(500).default([]),
+    requiredDirectories: external_exports.array(external_exports.string().max(1024)).max(500).default([])
   }).default({}),
   documentation: external_exports.object({
     minFileSizeBytes: external_exports.number().int().nonnegative().default(20),
     disallowPlaceholders: external_exports.boolean().default(true),
-    placeholderPatterns: external_exports.array(external_exports.string()).default([
+    placeholderPatterns: external_exports.array(external_exports.string().max(1024)).max(200).default([
       "TODO",
       "FIXME",
       "LOREM IPSUM",
@@ -14858,7 +14858,7 @@ var ReleaseReadinessConfigSchema = external_exports.object({
       "REPLACE_ME",
       "COMING SOON"
     ]),
-    requiredDocs: external_exports.array(RequiredDocSchema).default([])
+    requiredDocs: external_exports.array(RequiredDocSchema).max(500).default([])
   }).default({}),
   packageMetadata: external_exports.object({
     enabled: external_exports.boolean().default(true),
@@ -14874,8 +14874,8 @@ var ReleaseReadinessConfigSchema = external_exports.object({
   }).default({}),
   scripts: external_exports.object({
     execute: external_exports.boolean().default(false),
-    requiredScripts: external_exports.array(external_exports.string()).default([]),
-    commands: external_exports.array(ScriptCommandSchema).default([]),
+    requiredScripts: external_exports.array(external_exports.string().max(1024)).max(200).default([]),
+    commands: external_exports.array(ScriptCommandSchema).max(100).default([]),
     timeoutMs: external_exports.number().int().positive().default(6e4),
     maxOutputBytes: external_exports.number().int().positive().default(1048576)
     // 1MB
@@ -14883,7 +14883,7 @@ var ReleaseReadinessConfigSchema = external_exports.object({
   secrets: external_exports.object({
     enabled: external_exports.boolean().default(true),
     maxFileSizeKb: external_exports.number().int().positive().default(512),
-    excludePaths: external_exports.array(external_exports.string()).default([
+    excludePaths: external_exports.array(external_exports.string().max(1024)).max(500).default([
       "node_modules/**",
       "dist/**",
       "build/**",
@@ -14906,7 +14906,7 @@ var ReleaseReadinessConfigSchema = external_exports.object({
       "*.mp4"
     ]),
     includeUntracked: external_exports.boolean().default(true),
-    additionalPatterns: external_exports.array(SecretPatternSchema).default([])
+    additionalPatterns: external_exports.array(SecretPatternSchema).max(200).default([])
   }).default({}),
   dependencies: external_exports.object({
     checkLockfile: external_exports.boolean().default(true),
@@ -14917,12 +14917,12 @@ var ReleaseReadinessConfigSchema = external_exports.object({
   git: external_exports.object({
     checkUncommitted: external_exports.boolean().default(false),
     checkBranch: external_exports.boolean().default(false),
-    allowedBranches: external_exports.array(external_exports.string()).default(["main", "master", "release/*"])
+    allowedBranches: external_exports.array(external_exports.string().max(1024)).max(100).default(["main", "master", "release/*"])
   }).default({}),
   checklist: external_exports.object({
     checklistFile: external_exports.string().optional(),
     requireAllCompleted: external_exports.boolean().default(true),
-    requiredItems: external_exports.array(external_exports.string()).default([])
+    requiredItems: external_exports.array(external_exports.string().max(1024)).max(500).default([])
   }).default({}),
   reporting: external_exports.object({
     format: external_exports.enum(["all", "summary", "markdown", "json", "console"]).default("all"),
@@ -14931,7 +14931,7 @@ var ReleaseReadinessConfigSchema = external_exports.object({
     annotateGitHub: external_exports.boolean().default(true),
     createSummary: external_exports.boolean().default(true)
   }).default({}),
-  customRules: external_exports.array(CustomRuleSchema).default([])
+  customRules: external_exports.array(CustomRuleSchema).max(500).default([])
 }).strict();
 
 // src/config/loader.ts
