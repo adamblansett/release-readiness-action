@@ -14,48 +14,38 @@ inputs:
     required: false
     default: '.'
   fail-on:
-    description: 'Minimum severity level to fail the action: error, warning, or never'
+    description: 'Minimum severity level to fail the action: error, warning, or never (default: error)'
     required: false
-    default: 'error'
   fail-on-secrets:
-    description: 'Whether any detected secret causes immediate failure regardless of fail-on'
+    description: 'Whether any detected secret causes immediate failure regardless of fail-on (default: true)'
     required: false
-    default: 'true'
   execute-scripts:
-    description: 'Explicit opt-in to execute configured validation scripts (e.g. test, lint, build)'
+    description: 'Explicit opt-in to execute configured validation scripts (e.g. test, lint, build) (default: false)'
     required: false
-    default: 'false'
   scripts-to-run:
     description: 'Comma-separated list of scripts to execute when execute-scripts is enabled'
     required: false
   check-secrets:
-    description: 'Enable local repository secret scanning'
+    description: 'Enable local repository secret scanning (default: true)'
     required: false
-    default: 'true'
   check-uncommitted:
-    description: 'Check for dirty git state or uncommitted changes'
+    description: 'Check for dirty git state or uncommitted changes (default: false)'
     required: false
-    default: 'false'
   check-tag-version:
-    description: 'Verify git tag matches package version (e.g. in release tag workflows)'
+    description: 'Verify git tag matches package version (e.g. in release tag workflows) (default: false)'
     required: false
-    default: 'false'
   audit-dependencies:
-    description: 'Run npm audit dependency security check (requires network)'
+    description: 'Run npm audit dependency security check (requires network) (default: false)'
     required: false
-    default: 'false'
   output-format:
-    description: 'Report output format: all, markdown, json, or console'
+    description: 'Report output format: all, summary, markdown, json, or console (default: all)'
     required: false
-    default: 'all'
   create-summary:
-    description: 'Emit GFM report into GitHub Step Summary'
+    description: 'Emit GFM report into GitHub Step Summary (default: true)'
     required: false
-    default: 'true'
   annotate-github:
-    description: 'Emit inline GitHub Action PR annotations for errors and warnings'
+    description: 'Emit inline GitHub Action PR annotations for errors and warnings (default: true)'
     required: false
-    default: 'true'
 
 outputs:
   passed:
@@ -72,5 +62,5 @@ outputs:
     description: 'Markdown summary of the evaluation report'
 
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: 'node24'
+  main: 'dist/action.js'

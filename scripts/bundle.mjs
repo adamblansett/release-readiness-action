@@ -13,14 +13,14 @@ async function bundle() {
     entryPoints: ['src/action/main.ts'],
     bundle: true,
     platform: 'node',
-    target: 'node20',
+    target: 'node24',
     format: 'esm',
-    outfile: 'dist/index.js',
-    sourcemap: true,
+    outfile: 'dist/action.js',
+    sourcemap: false,
     minify: false,
     banner: {
       js:
-        '// Release Readiness Action - Bundled for GitHub Actions runner (Node 20+)\n' + esmBanner,
+        '// Release Readiness Action - Bundled for GitHub Actions runner (Node 24+)\n' + esmBanner,
     },
   });
 
@@ -29,14 +29,27 @@ async function bundle() {
     entryPoints: ['src/cli/index.ts'],
     bundle: true,
     platform: 'node',
-    target: 'node20',
+    target: 'node24',
     format: 'esm',
     outfile: 'dist/cli.js',
-    sourcemap: true,
+    sourcemap: false,
     minify: false,
     banner: {
       js: '#!/usr/bin/env node\n// Release Readiness Action CLI\n' + esmBanner,
     },
+  });
+
+  // 3. Bundle Library entry point (external dependencies, matches dist/index.d.ts)
+  await esbuild.build({
+    entryPoints: ['src/index.ts'],
+    bundle: true,
+    packages: 'external',
+    platform: 'node',
+    target: 'node24',
+    format: 'esm',
+    outfile: 'dist/index.js',
+    sourcemap: false,
+    minify: false,
   });
 
   try {

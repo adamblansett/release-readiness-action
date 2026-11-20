@@ -62,4 +62,39 @@ describe('Checklist Checks', () => {
     expect(allCompleted).toBeDefined();
     expect(allCompleted?.status).toBe('pass');
   });
+
+  it('verifies checklist.requiredItems against completed, pending, missing items, and missing file', () => {
+    const context = createMockContext({
+      'RELEASE_CHECKLIST.md': [
+        '# Release Checklist',
+        '- [x] Security review complete',
+        '- [ ] Load test verified',
+      ].join('\n'),
+    });
+
+    const results = runChecklistChecks(context, {
+      ...DEFAULT_CONFIG.checklist,
+      requireAllCompleted: false,
+      requiredItems: ['Security review', 'Load test', 'Rollback plan'],
+    });
+
+    const securityRes = results.find((r) => r.name.includes('Security review'));
+    expect(securityRes?.status).toBe('pass');
+
+    const loadRes = results.find((r) => r.name.includes('Load test'));
+    expect(loadRes?.status).toBe('fail');
+    expect(loadRes?.line).toBe(3);
+
+    const rollbackRes = results.find((r) => r.name.includes('Rollback plan'));
+    expect(rollbackRes?.status).toBe('fail');
+    expect(rollbackRes?.message).toContain('was not found');
+
+    const emptyContext = createMockContext({});
+    const missingFileResults = runChecklistChecks(emptyContext, {
+      ...DEFAULT_CONFIG.checklist,
+      requiredItems: ['Security review'],
+    });
+    expect(missingFileResults[0]?.status).toBe('fail');
+    expect(missingFileResults[0]?.message).toContain('no release checklist file was found');
+  });
 });

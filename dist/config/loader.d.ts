@@ -18,4 +18,3 @@ export declare function deepMerge<T extends Record<string, unknown>>(base: T, ov
  * applying any provided runtime overrides.
  */
 export declare function loadConfig(options?: LoadConfigOptions): LoadedConfigResult;
-//# sourceMappingURL=loader.d.ts.map

@@ -1,7 +1,9 @@
 import { Command } from 'commander';
-import { writeFileSync, existsSync } from 'node:fs';
+import { writeFileSync, existsSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pc from 'picocolors';
+import { PACKAGE_VERSION } from '../version.js';
 import { loadConfig } from '../config/loader.js';
 import { ReleaseReadinessEngine } from '../core/engine.js';
 import { formatTerminalReport } from '../reporters/terminal-reporter.js';
@@ -62,10 +64,10 @@ export async function runCli(): Promise<void> {
   program
     .name('release-readiness')
     .description('Evaluate software release-readiness before release or deployment')
-    .version('1.0.0')
+    .version(PACKAGE_VERSION)
     .option('-c, --config <path>', 'Path to configuration file (.release-readiness.yml or .json)')
     .option('-d, --cwd <path>', 'Working directory to evaluate', '.')
-    .option('--fail-on <level>', 'Fail threshold: error, warning, or never', 'error')
+    .option('--fail-on <level>', 'Fail threshold: error, warning, or never (default: error)')
     .option('--execute-scripts', 'Execute configured scripts (safe opt-in)', false)
     .option('--check-uncommitted', 'Fail if git working tree has uncommitted changes', false)
     .option('--no-secrets', 'Disable secret scanning')
@@ -88,11 +90,11 @@ export async function runCli(): Promise<void> {
   }
 
   try {
-    const overrides: Partial<import('../config/schema.js').RawReleaseReadinessConfig> = {
-      workingDirectory: opts.cwd,
-      failOn: opts.failOn,
-    };
+    const overrides: Partial<import('../config/schema.js').RawReleaseReadinessConfig> = {};
 
+    if (opts.failOn !== undefined) {
+      overrides.failOn = opts.failOn;
+    }
     if (opts.executeScripts) {
       overrides.scripts = { execute: true };
     }
@@ -134,7 +136,17 @@ export async function runCli(): Promise<void> {
   }
 }
 
+function isExecutedDirectly(): boolean {
+  const argvPath = process.argv[1];
+  if (!argvPath) return false;
+  try {
+    return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(resolve(argvPath));
+  } catch {
+    return resolve(fileURLToPath(import.meta.url)) === resolve(argvPath);
+  }
+}
+
 // Only invoke automatically when run as main module
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isExecutedDirectly()) {
   runCli();
 }

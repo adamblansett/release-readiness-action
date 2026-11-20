@@ -2,6 +2,7 @@
  * Release Readiness Action - Core Library Exports
  */
 
+export * from './version.js';
 export * from './types/index.js';
 export * from './config/schema.js';
 export * from './config/defaults.js';

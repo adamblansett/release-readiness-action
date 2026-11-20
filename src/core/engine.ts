@@ -16,6 +16,7 @@ import { runDependencyChecks } from '../checks/dependencies.js';
 import { runGitChecks } from '../checks/git.js';
 import { runChecklistChecks } from '../checks/checklist.js';
 import { runCustomRules } from '../checks/custom.js';
+import { getUntrackedGitFiles } from '../utils/git.js';
 
 export interface EngineRunOptions {
   config: ReleaseReadinessConfig;
@@ -61,8 +62,12 @@ export class ReleaseReadinessEngine {
     allResults.push(...scriptResults);
 
     // Secret scanner
+    const untrackedFiles =
+      this.config.secrets.enabled && !this.config.secrets.includeUntracked
+        ? await getUntrackedGitFiles(context.workingDirectory)
+        : undefined;
     const secretScanner = new SecretScanner(this.config.secrets);
-    allResults.push(...secretScanner.scan(context));
+    allResults.push(...secretScanner.scan(context, { untrackedFiles }));
 
     // Dependency checks
     const depResults = await runDependencyChecks(context, this.config.dependencies);

@@ -1,6 +1,7 @@
 /**
  * Release Readiness Action - Core Library Exports
  */
+export * from './version.js';
 export * from './types/index.js';
 export * from './config/schema.js';
 export * from './config/defaults.js';
@@ -17,4 +18,3 @@ export * from './utils/subprocess.js';
 export * from './utils/text.js';
 export * from './utils/path-utils.js';
 export * from './utils/git.js';
-//# sourceMappingURL=index.d.ts.map

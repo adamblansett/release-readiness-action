@@ -10,9 +10,9 @@ export interface ActionInputs {
   annotateGitHub: boolean;
 }
 
-function parseBooleanInput(name: string, defaultValue?: boolean): boolean | undefined {
+function parseBooleanInput(name: string): boolean | undefined {
   const val = core.getInput(name).trim();
-  if (!val) return defaultValue;
+  if (!val) return undefined;
   return val.toLowerCase() === 'true' || val === '1';
 }
 
@@ -24,11 +24,18 @@ function parseStringInput(name: string): string | undefined {
 export function parseActionInputs(): ActionInputs {
   const configPath = parseStringInput('config-path');
   const workingDirectory = parseStringInput('working-directory') || '.';
+
   const failOnRaw = parseStringInput('fail-on')?.toLowerCase();
-  const failOn =
-    failOnRaw === 'error' || failOnRaw === 'warning' || failOnRaw === 'never'
-      ? failOnRaw
-      : undefined;
+  let failOn: 'error' | 'warning' | 'never' | undefined;
+  if (failOnRaw !== undefined) {
+    if (failOnRaw === 'error' || failOnRaw === 'warning' || failOnRaw === 'never') {
+      failOn = failOnRaw;
+    } else {
+      throw new Error(
+        `Invalid "fail-on" input value "${failOnRaw}". Expected one of: error, warning, never.`,
+      );
+    }
+  }
 
   const failOnSecrets = parseBooleanInput('fail-on-secrets');
   const executeScripts = parseBooleanInput('execute-scripts');
@@ -36,25 +43,32 @@ export function parseActionInputs(): ActionInputs {
   const checkUncommitted = parseBooleanInput('check-uncommitted');
   const checkTagVersion = parseBooleanInput('check-tag-version');
   const auditDependencies = parseBooleanInput('audit-dependencies');
-  const createSummary = parseBooleanInput('create-summary', true) ?? true;
-  const annotateGitHub = parseBooleanInput('annotate-github', true) ?? true;
+  const createSummaryInput = parseBooleanInput('create-summary');
+  const annotateGitHubInput = parseBooleanInput('annotate-github');
 
   const rawFormat = parseStringInput('output-format')?.toLowerCase();
-  const outputFormat =
-    rawFormat === 'summary' ||
-    rawFormat === 'markdown' ||
-    rawFormat === 'json' ||
-    rawFormat === 'console'
-      ? rawFormat
-      : 'all';
+  let parsedFormat: ActionInputs['outputFormat'] | undefined;
+  if (rawFormat !== undefined) {
+    if (
+      rawFormat === 'all' ||
+      rawFormat === 'summary' ||
+      rawFormat === 'markdown' ||
+      rawFormat === 'json' ||
+      rawFormat === 'console'
+    ) {
+      parsedFormat = rawFormat;
+    } else {
+      throw new Error(
+        `Invalid "output-format" input value "${rawFormat}". Expected one of: all, summary, markdown, json, console.`,
+      );
+    }
+  }
 
   const scriptsToRun = parseStringInput('scripts-to-run');
 
-  const overrides: Partial<RawReleaseReadinessConfig> = {
-    workingDirectory,
-  };
+  const overrides: Partial<RawReleaseReadinessConfig> = {};
 
-  if (failOn) overrides.failOn = failOn;
+  if (failOn !== undefined) overrides.failOn = failOn;
   if (failOnSecrets !== undefined) overrides.failOnSecrets = failOnSecrets;
 
   if (checkSecrets !== undefined) {
@@ -73,37 +87,48 @@ export function parseActionInputs(): ActionInputs {
     overrides.dependencies = { audit: auditDependencies };
   }
 
-  if (executeScripts !== undefined || scriptsToRun) {
+  const scriptOverrides: Partial<NonNullable<RawReleaseReadinessConfig['scripts']>> = {};
+  if (executeScripts !== undefined) {
+    scriptOverrides.execute = executeScripts;
+  }
+  if (scriptsToRun) {
     const commands = scriptsToRun
-      ? scriptsToRun
-          .split(',')
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0)
-          .map((s) => ({
-            name: `npm run ${s}`,
-            command: 'npm',
-            args: ['run', s],
-          }))
-      : [];
-
-    overrides.scripts = {
-      execute: executeScripts ?? false,
-      commands,
-    };
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0)
+      .map((s) => ({
+        name: `npm run ${s}`,
+        command: 'npm',
+        args: ['run', s],
+      }));
+    if (commands.length > 0) {
+      scriptOverrides.commands = commands;
+    }
+  }
+  if (Object.keys(scriptOverrides).length > 0) {
+    overrides.scripts = scriptOverrides;
   }
 
-  overrides.reporting = {
-    format: outputFormat,
-    createSummary,
-    annotateGitHub,
-  };
+  const reportingOverrides: Partial<NonNullable<RawReleaseReadinessConfig['reporting']>> = {};
+  if (parsedFormat !== undefined) {
+    reportingOverrides.format = parsedFormat;
+  }
+  if (createSummaryInput !== undefined) {
+    reportingOverrides.createSummary = createSummaryInput;
+  }
+  if (annotateGitHubInput !== undefined) {
+    reportingOverrides.annotateGitHub = annotateGitHubInput;
+  }
+  if (Object.keys(reportingOverrides).length > 0) {
+    overrides.reporting = reportingOverrides;
+  }
 
   return {
     configPath,
     workingDirectory,
     overrides,
-    outputFormat,
-    createSummary,
-    annotateGitHub,
+    outputFormat: parsedFormat ?? 'all',
+    createSummary: createSummaryInput ?? true,
+    annotateGitHub: annotateGitHubInput ?? true,
   };
 }

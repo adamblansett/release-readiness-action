@@ -5,7 +5,7 @@ Thank you for your interest in contributing to Release Readiness Action!
 ## Development Setup
 
 1. **Prerequisites:**
-   - Node.js >= 20.0.0
+   - Node.js >= 24.0.0
    - npm >= 10.0.0
 
 2. **Clone and Install:**

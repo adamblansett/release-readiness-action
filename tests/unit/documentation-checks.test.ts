@@ -68,4 +68,50 @@ describe('Documentation Checks', () => {
 
     expect(results.every((r) => r.status === 'pass')).toBe(true);
   });
+
+  it('detects bracketed placeholders and preserves line numbers after fenced code blocks', () => {
+    const context = createMockContext({
+      'README.md': [
+        '# Docs',
+        '```md',
+        'TODO inside fenced code block',
+        '[PROJECT NAME] inside fenced code block',
+        '```',
+        'Also `TODO` in inline code.',
+        'Replace [PROJECT NAME] before release.',
+      ].join('\n'),
+      'CHANGELOG.md': '# Changelog\n<INSERT release summary here',
+    });
+
+    const results = runDocumentationChecks(context, DEFAULT_CONFIG.documentation);
+
+    const readmeRes = results.find((r) => r.id === 'DOC-PLACEHOLDER-README_md');
+    expect(readmeRes?.status).toBe('warn');
+    expect(readmeRes?.line).toBe(7);
+
+    const changelogRes = results.find((r) => r.id === 'DOC-PLACEHOLDER-CHANGELOG_md');
+    expect(changelogRes?.status).toBe('warn');
+    expect(changelogRes?.line).toBe(2);
+  });
+
+  it('enforces per-document minSize and title from requiredDocs', () => {
+    const context = createMockContext({
+      'docs/guide.md': '# Wrong Heading\nShort body text.',
+      'docs/notes.md': 'Too small',
+    });
+
+    const results = runDocumentationChecks(context, {
+      ...DEFAULT_CONFIG.documentation,
+      requiredDocs: [
+        { path: 'docs/guide.md', title: 'Deployment Guide' },
+        { path: 'docs/notes.md', minSize: 50 },
+      ],
+    });
+
+    const titleRes = results.find((r) => r.id === 'DOC-TITLE-docs_guide_md');
+    expect(titleRes?.status).toBe('fail');
+
+    const sizeRes = results.find((r) => r.id === 'DOC-EMPTY-docs_notes_md');
+    expect(sizeRes?.status).toBe('fail');
+  });
 });

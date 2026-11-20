@@ -1,4 +1,4 @@
-import { resolve, relative, normalize } from 'node:path';
+import { resolve, relative, normalize, isAbsolute, sep } from 'node:path';
 
 /**
  * Checks whether targetPath is strictly inside (or equal to) parentPath.
@@ -6,7 +6,7 @@ import { resolve, relative, normalize } from 'node:path';
  */
 export function isPathInside(parentPath: string, targetPath: string): boolean {
   const rel = relative(resolve(parentPath), resolve(targetPath));
-  return !rel.startsWith('..') && !rel.startsWith('/');
+  return rel === '' || (rel !== '..' && !rel.startsWith('..' + sep) && !isAbsolute(rel));
 }
 
 /**

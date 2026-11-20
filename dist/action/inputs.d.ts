@@ -8,4 +8,3 @@ export interface ActionInputs {
     annotateGitHub: boolean;
 }
 export declare function parseActionInputs(): ActionInputs;
-//# sourceMappingURL=inputs.d.ts.map

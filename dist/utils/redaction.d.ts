@@ -11,4 +11,3 @@ export declare function redactEvidence(evidence: string, matchedSecrets: string[
  * Standard generic patterns for masking in strings when secret is matched.
  */
 export declare function maskSensitiveKeyValue(key: string, value: string): string;
-//# sourceMappingURL=redaction.d.ts.map

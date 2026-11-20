@@ -2,6 +2,7 @@ import type { CheckResult, EngineContext } from '../types/index.js';
 import type { ReleaseReadinessConfig } from '../config/schema.js';
 import { getLocationFromIndex } from '../utils/text.js';
 import { redactSecret, redactEvidence } from '../utils/redaction.js';
+import { normalizeRelativePath } from '../utils/path-utils.js';
 
 export interface SecretPatternDef {
   id: string;
@@ -142,8 +143,9 @@ export class SecretScanner {
     }
   }
 
-  public scan(context: EngineContext): CheckResult[] {
+  public scan(context: EngineContext, options?: { untrackedFiles?: Set<string> }): CheckResult[] {
     const results: CheckResult[] = [];
+    const untrackedFiles = options?.untrackedFiles;
 
     if (!this.config.enabled) {
       results.push({
@@ -159,6 +161,9 @@ export class SecretScanner {
 
     // 1. Check for sensitive committed .env files
     for (const envFile of SENSITIVE_ENV_FILES) {
+      if (!this.config.includeUntracked && untrackedFiles?.has(normalizeRelativePath(envFile))) {
+        continue;
+      }
       if (context.hasFile(envFile)) {
         const content = context.readFile(envFile);
         if (content && content.trim().length > 0) {
@@ -182,6 +187,13 @@ export class SecretScanner {
     const maxBytes = this.config.maxFileSizeKb * 1024;
 
     for (const file of context.files) {
+      if (
+        !this.config.includeUntracked &&
+        untrackedFiles?.has(normalizeRelativePath(file.relativePath))
+      ) {
+        continue;
+      }
+
       // Skip files exceeding max size to avoid memory exhaustion
       if (file.sizeBytes > maxBytes) {
         continue;

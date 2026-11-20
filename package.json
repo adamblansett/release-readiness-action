@@ -1,6 +1,6 @@
 {
   "name": "release-readiness-action",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Configurable GitHub Action and developer CLI to evaluate software release-readiness before release or deployment.",
   "type": "module",
   "main": "./dist/index.js",
@@ -22,12 +22,13 @@
     "CHANGELOG.md"
   ],
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
+    "clean": "node -e \"import('node:fs').then(fs => fs.rmSync('dist', { recursive: true, force: true }))\"",
     "build:types": "tsc --emitDeclarationOnly",
     "build:bundle": "node scripts/bundle.mjs",
-    "build": "npm run build:types && npm run build:bundle",
+    "build": "npm run clean && npm run build:types && npm run build:bundle",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",

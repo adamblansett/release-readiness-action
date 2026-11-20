@@ -1,4 +1,5 @@
 import { executeSubprocess } from './subprocess.js';
+import { normalizeRelativePath } from './path-utils.js';
 
 export interface GitStatusResult {
   isClean: boolean;
@@ -103,4 +104,26 @@ export async function getCurrentGitBranch(cwd: string): Promise<string | null> {
   }
 
   return null;
+}
+
+/**
+ * Returns normalized relative paths for untracked, non-ignored files in Git.
+ */
+export async function getUntrackedGitFiles(cwd: string): Promise<Set<string>> {
+  const result = await executeSubprocess('git', ['ls-files', '--others', '--exclude-standard'], {
+    cwd,
+    timeoutMs: 10000,
+  });
+
+  if (result.exitCode !== 0) {
+    return new Set();
+  }
+
+  const files = result.stdout
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line) => normalizeRelativePath(line));
+
+  return new Set(files);
 }

@@ -10,6 +10,7 @@ export declare class SecretScanner {
     private readonly config;
     private readonly patterns;
     constructor(config: ReleaseReadinessConfig['secrets']);
-    scan(context: EngineContext): CheckResult[];
+    scan(context: EngineContext, options?: {
+        untrackedFiles?: Set<string>;
+    }): CheckResult[];
 }
-//# sourceMappingURL=secret-scanner.d.ts.map

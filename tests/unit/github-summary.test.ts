@@ -85,4 +85,63 @@ describe('GitHub Summary and Annotations', () => {
     addRawSpy.mockRestore();
     writeSpy.mockRestore();
   });
+
+  it('emits warning annotations (not error) for failed checks with warning severity', async () => {
+    const errorSpy = vi.spyOn(core, 'error').mockImplementation(() => {});
+    const warningSpy = vi.spyOn(core, 'warning').mockImplementation(() => {});
+
+    const report: ReadinessReport = {
+      timestamp: '2026-11-19T00:00:00Z',
+      workingDirectory: '.',
+      passed: true,
+      failThreshold: 'error',
+      summary: {
+        totalChecks: 1,
+        passed: 0,
+        warnings: 1,
+        errors: 0,
+        skipped: 0,
+        durationMs: 10,
+      },
+      categories: {
+        structure: { total: 1, passed: 0, warnings: 1, errors: 0, skipped: 0 },
+        documentation: { total: 0, passed: 0, warnings: 0, errors: 0, skipped: 0 },
+        package: { total: 0, passed: 0, warnings: 0, errors: 0, skipped: 0 },
+        scripts: { total: 0, passed: 0, warnings: 0, errors: 0, skipped: 0 },
+        secrets: { total: 0, passed: 0, warnings: 0, errors: 0, skipped: 0 },
+        dependencies: { total: 0, passed: 0, warnings: 0, errors: 0, skipped: 0 },
+        git: { total: 0, passed: 0, warnings: 0, errors: 0, skipped: 0 },
+        checklist: { total: 0, passed: 0, warnings: 0, errors: 0, skipped: 0 },
+        custom: { total: 0, passed: 0, warnings: 0, errors: 0, skipped: 0 },
+      },
+      results: [
+        {
+          id: 'STRUC-SECURITY',
+          category: 'structure',
+          name: 'Security Policy Presence',
+          status: 'fail',
+          severity: 'warning',
+          filePath: 'SECURITY.md',
+          message: 'No SECURITY.md file found.',
+        },
+      ],
+    };
+
+    await writeGitHubSummaryAndAnnotations(report, {
+      createSummary: false,
+      annotateGitHub: true,
+    });
+
+    expect(errorSpy).not.toHaveBeenCalled();
+    expect(warningSpy).toHaveBeenCalledWith(
+      'No SECURITY.md file found.',
+      expect.objectContaining({
+        title: '[STRUC-SECURITY] Security Policy Presence',
+        file: 'SECURITY.md',
+      }),
+    );
+
+    errorSpy.mockRestore();
+    warningSpy.mockRestore();
+  });
 });

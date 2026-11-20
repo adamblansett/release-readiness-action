@@ -11,9 +11,9 @@ failOnSecrets: true
 structure:
   checkReadme: true
   checkLicense: true
-  checkChangelog: false
-  checkSecurityPolicy: false
-  checkContributing: false
+  checkChangelog: true
+  checkSecurityPolicy: true
+  checkContributing: true
   checkCodeowners: false
   checkCiWorkflow: true
   checkReleaseNotes: false
@@ -37,9 +37,9 @@ packageMetadata:
   enabled: true
   requireName: true
   requireVersion: true
-  requireDescription: false
+  requireDescription: true
   requireLicense: true
-  requireRepository: false
+  requireRepository: true
   validateSemver: true
   validateEntryPoints: true
   validateFilesWhitelist: true

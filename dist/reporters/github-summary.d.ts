@@ -3,4 +3,3 @@ export declare function writeGitHubSummaryAndAnnotations(report: ReadinessReport
     createSummary?: boolean;
     annotateGitHub?: boolean;
 }): Promise<void>;
-//# sourceMappingURL=github-summary.d.ts.map

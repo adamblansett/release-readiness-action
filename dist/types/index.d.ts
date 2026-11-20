@@ -67,4 +67,3 @@ export interface EngineContext {
     readJson: <T = unknown>(relativePath: string) => T | null;
     getFileSize: (relativePath: string) => number | null;
 }
-//# sourceMappingURL=index.d.ts.map

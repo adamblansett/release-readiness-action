@@ -33,10 +33,12 @@ export async function writeGitHubSummaryAndAnnotations(
           ? `${finding.message}\nRemediation: ${finding.remediation}`
           : finding.message;
 
-        if (finding.severity === 'error' || finding.status === 'fail') {
+        if (finding.severity === 'error') {
           core.error(messageText, annotationProperties);
-        } else {
+        } else if (finding.severity === 'warning' || finding.status === 'warn') {
           core.warning(messageText, annotationProperties);
+        } else {
+          core.notice(messageText, annotationProperties);
         }
       }
     }

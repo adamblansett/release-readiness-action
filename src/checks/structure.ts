@@ -248,6 +248,40 @@ export function runStructureChecks(
     }
   }
 
+  // 7b. Release Notes Check
+  if (config.checkReleaseNotes) {
+    const releaseNotesCandidates = [
+      'RELEASE_NOTES.md',
+      'release-notes.md',
+      'docs/RELEASE_NOTES.md',
+      '.github/RELEASE_NOTES.md',
+    ];
+    const foundReleaseNotes = releaseNotesCandidates.find((c) => context.hasFile(c));
+    if (foundReleaseNotes) {
+      results.push({
+        id: 'STRUC-RELEASE-NOTES',
+        category: 'structure',
+        name: 'Release Notes Presence',
+        status: 'pass',
+        severity: 'info',
+        filePath: foundReleaseNotes,
+        message: `Release notes found at "${foundReleaseNotes}".`,
+      });
+    } else {
+      results.push({
+        id: 'STRUC-RELEASE-NOTES',
+        category: 'structure',
+        name: 'Release Notes Presence',
+        status: 'fail',
+        severity: 'warning',
+        filePath: 'RELEASE_NOTES.md',
+        message: 'No RELEASE_NOTES.md file found.',
+        remediation:
+          'Add a RELEASE_NOTES.md file summarizing changes, upgrade notes, and known issues for the release.',
+      });
+    }
+  }
+
   // 8. Custom Required Files
   for (const reqFile of config.requiredFiles) {
     if (context.hasFile(reqFile)) {

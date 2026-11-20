@@ -20,4 +20,7 @@ export declare function getCurrentGitTag(cwd: string): Promise<string | null>;
  * Retrieves the current git branch name.
  */
 export declare function getCurrentGitBranch(cwd: string): Promise<string | null>;
-//# sourceMappingURL=git.d.ts.map
+/**
+ * Returns normalized relative paths for untracked, non-ignored files in Git.
+ */
+export declare function getUntrackedGitFiles(cwd: string): Promise<Set<string>>;

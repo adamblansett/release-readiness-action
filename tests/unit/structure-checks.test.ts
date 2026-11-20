@@ -102,4 +102,31 @@ describe('Structure Checks', () => {
     const depRes = results.find((r) => r.id === 'STRUC-REQ-FILE-docs_deployment_md');
     expect(depRes?.status).toBe('fail');
   });
+
+  it('checks release notes presence when checkReleaseNotes is enabled', () => {
+    const baseFiles = {
+      'README.md': 'content',
+      LICENSE: 'content',
+      '.github/workflows/ci.yml': 'content',
+    };
+
+    const missingCtx = createMockContext(baseFiles);
+    const missingResults = runStructureChecks(missingCtx, {
+      ...DEFAULT_CONFIG.structure,
+      checkReleaseNotes: true,
+    });
+    const missingRes = missingResults.find((r) => r.id === 'STRUC-RELEASE-NOTES');
+    expect(missingRes?.status).toBe('fail');
+    expect(missingRes?.severity).toBe('warning');
+
+    const presentCtx = createMockContext({
+      ...baseFiles,
+      'RELEASE_NOTES.md': '# Release Notes\nv1.0.2 changes.',
+    });
+    const presentResults = runStructureChecks(presentCtx, {
+      ...DEFAULT_CONFIG.structure,
+      checkReleaseNotes: true,
+    });
+    expect(presentResults.find((r) => r.id === 'STRUC-RELEASE-NOTES')?.status).toBe('pass');
+  });
 });

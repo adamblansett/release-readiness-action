@@ -15,4 +15,3 @@ export declare function normalizeRelativePath(p: string): string;
  * - 'exact/path' (exact match or path prefix)
  */
 export declare function matchesPattern(path: string, pattern: string): boolean;
-//# sourceMappingURL=path-utils.d.ts.map

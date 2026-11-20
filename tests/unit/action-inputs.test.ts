@@ -24,7 +24,25 @@ describe('GitHub Action Inputs Parsing', () => {
     expect(inputs.outputFormat).toBe('all');
     expect(inputs.createSummary).toBe(true);
     expect(inputs.annotateGitHub).toBe(true);
-    expect(inputs.overrides.failOn).toBeUndefined();
+    expect(inputs.overrides).toEqual({});
+  });
+
+  it('does not clear file-configured script commands when scripts-to-run is omitted', () => {
+    process.env['INPUT_EXECUTE-SCRIPTS'] = 'true';
+
+    const inputs = parseActionInputs();
+
+    expect(inputs.overrides.scripts?.execute).toBe(true);
+    expect(inputs.overrides.scripts?.commands).toBeUndefined();
+  });
+
+  it('throws on invalid fail-on or output-format inputs', () => {
+    process.env['INPUT_FAIL-ON'] = 'critical';
+    expect(() => parseActionInputs()).toThrow(/Invalid "fail-on"/);
+
+    delete process.env['INPUT_FAIL-ON'];
+    process.env['INPUT_OUTPUT-FORMAT'] = 'xml';
+    expect(() => parseActionInputs()).toThrow(/Invalid "output-format"/);
   });
 
   it('correctly maps GitHub Action inputs to configuration overrides', () => {

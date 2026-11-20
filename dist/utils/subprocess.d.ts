@@ -20,4 +20,3 @@ export interface SubprocessResult {
  * and graceful process termination.
  */
 export declare function executeSubprocess(command: string, args?: string[], options?: SubprocessOptions): Promise<SubprocessResult>;
-//# sourceMappingURL=subprocess.d.ts.map

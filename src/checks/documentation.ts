@@ -22,6 +22,7 @@ export function runDocumentationChecks(
   ];
 
   const filesToCheck = new Set<string>();
+  const requiredDocMap = new Map(config.requiredDocs.map((d) => [d.path, d]));
 
   for (const candidate of docCandidates) {
     if (context.hasFile(candidate)) {
@@ -51,11 +52,12 @@ export function runDocumentationChecks(
       continue;
     }
 
+    const reqDoc = requiredDocMap.get(filePath);
     const content = context.readFile(filePath);
     const size = context.getFileSize(filePath) ?? 0;
 
     // 1. Empty / Trivial content check
-    const minSize = config.minFileSizeBytes;
+    const minSize = reqDoc?.minSize ?? config.minFileSizeBytes;
     if (!content || content.trim().length === 0 || size < minSize) {
       results.push({
         id: `DOC-EMPTY-${filePath.replace(/[^a-zA-Z0-9]/g, '_')}`,
@@ -72,16 +74,40 @@ export function runDocumentationChecks(
       continue;
     }
 
-    // 2. Placeholder check (e.g. TODO, [PROJECT NAME], Lorem ipsum)
+    let hasIssue = false;
+
+    // 2. Required title check
+    if (reqDoc?.title && !content.toLowerCase().includes(reqDoc.title.toLowerCase())) {
+      results.push({
+        id: `DOC-TITLE-${filePath.replace(/[^a-zA-Z0-9]/g, '_')}`,
+        category: 'documentation',
+        name: `Documentation Title Check: ${filePath}`,
+        status: 'fail',
+        severity: 'error',
+        filePath,
+        line: 1,
+        column: 1,
+        message: `Documentation file "${filePath}" does not contain required title "${reqDoc.title}".`,
+        remediation: `Add the title or heading "${reqDoc.title}" to "${filePath}".`,
+      });
+      hasIssue = true;
+    }
+
+    // 3. Placeholder check (e.g. TODO, [PROJECT NAME], Lorem ipsum)
     if (config.disallowPlaceholders && config.placeholderPatterns.length > 0) {
-      // Strip fenced code blocks and inline code from markdown before checking for prose placeholders
+      // Mask fenced code blocks and inline code while preserving character offsets and newlines
+      const maskPreservingNewlines = (match: string) => match.replace(/[^\n]/g, ' ');
       const textToScan = filePath.endsWith('.md')
-        ? content.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]+`/g, '')
+        ? content
+            .replace(/```[\s\S]*?```/g, maskPreservingNewlines)
+            .replace(/`[^`\n]+`/g, maskPreservingNewlines)
         : content;
 
-      let foundPlaceholder = false;
       for (const pattern of config.placeholderPatterns) {
-        const regex = new RegExp(`\\b${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+        const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const prefix = /^\w/.test(pattern) ? '\\b' : '';
+        const suffix = /\w$/.test(pattern) ? '\\b' : '';
+        const regex = new RegExp(`${prefix}${escaped}${suffix}`, 'i');
         const match = regex.exec(textToScan);
         if (match) {
           const loc = getLocationFromIndex(content, match.index);
@@ -97,23 +123,13 @@ export function runDocumentationChecks(
             message: `Unresolved placeholder "${match[0]}" found in "${filePath}" on line ${loc.line}: "${loc.lineSnippet}".`,
             remediation: `Review "${filePath}" and replace template placeholders with actual release documentation.`,
           });
-          foundPlaceholder = true;
+          hasIssue = true;
           break; // Report the first placeholder finding per file to avoid noise
         }
       }
+    }
 
-      if (!foundPlaceholder) {
-        results.push({
-          id: `DOC-VALID-${filePath.replace(/[^a-zA-Z0-9]/g, '_')}`,
-          category: 'documentation',
-          name: `Documentation Content: ${filePath}`,
-          status: 'pass',
-          severity: 'info',
-          filePath,
-          message: `Documentation file "${filePath}" contains valid non-placeholder content (${size} bytes).`,
-        });
-      }
-    } else {
+    if (!hasIssue) {
       results.push({
         id: `DOC-VALID-${filePath.replace(/[^a-zA-Z0-9]/g, '_')}`,
         category: 'documentation',
@@ -121,7 +137,9 @@ export function runDocumentationChecks(
         status: 'pass',
         severity: 'info',
         filePath,
-        message: `Documentation file "${filePath}" is present and non-empty (${size} bytes).`,
+        message: config.disallowPlaceholders
+          ? `Documentation file "${filePath}" contains valid non-placeholder content (${size} bytes).`
+          : `Documentation file "${filePath}" is present and non-empty (${size} bytes).`,
       });
     }
   }

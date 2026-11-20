@@ -20,4 +20,3 @@ export declare class FileCollector {
      */
     createContext(collectedFiles?: CollectedFile[]): EngineContext;
 }
-//# sourceMappingURL=file-collector.d.ts.map

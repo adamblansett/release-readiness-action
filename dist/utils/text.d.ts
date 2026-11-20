@@ -14,4 +14,3 @@ export declare function getLocationFromIndex(content: string, index: number): Lo
  * Safely truncates a string to maxLength bytes/characters with an indicator.
  */
 export declare function truncateText(text: string, maxLength: number): string;
-//# sourceMappingURL=text.d.ts.map

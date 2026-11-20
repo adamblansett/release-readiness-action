@@ -4,13 +4,18 @@ import { isPathInside, normalizeRelativePath, matchesPattern } from '../../src/u
 describe('Path Utilities', () => {
   describe('isPathInside', () => {
     it('returns true when child path is inside parent directory', () => {
+      expect(isPathInside('/home/user/project', '/home/user/project')).toBe(true);
       expect(isPathInside('/home/user/project', '/home/user/project/src/index.ts')).toBe(true);
       expect(isPathInside('/home/user/project', '/home/user/project/README.md')).toBe(true);
+      expect(isPathInside('/home/user/project', '/home/user/project/..file')).toBe(true);
     });
 
     it('returns false when child attempts directory traversal', () => {
       expect(isPathInside('/home/user/project', '/home/user/project/../../etc/passwd')).toBe(false);
       expect(isPathInside('/home/user/project', '/var/log/syslog')).toBe(false);
+      if (process.platform === 'win32') {
+        expect(isPathInside('C:\\project', 'D:\\other\\file.txt')).toBe(false);
+      }
     });
   });
 

@@ -7367,10 +7367,10 @@ var require_resolve_block_map = __commonJS({
       let offset = bm.offset;
       let commentEnd = null;
       for (const collItem of bm.items) {
-        const { start, key, sep, value } = collItem;
+        const { start, key, sep: sep2, value } = collItem;
         const keyProps = resolveProps.resolveProps(start, {
           indicator: "explicit-key-ind",
-          next: key ?? sep?.[0],
+          next: key ?? sep2?.[0],
           offset,
           onError,
           parentIndent: bm.indent,
@@ -7384,7 +7384,7 @@ var require_resolve_block_map = __commonJS({
             else if ("indent" in key && key.indent !== bm.indent)
               onError(offset, "BAD_INDENT", startColMsg);
           }
-          if (!keyProps.anchor && !keyProps.tag && !sep) {
+          if (!keyProps.anchor && !keyProps.tag && !sep2) {
             commentEnd = keyProps.end;
             if (keyProps.comment) {
               if (map.comment)
@@ -7408,7 +7408,7 @@ var require_resolve_block_map = __commonJS({
         ctx.atKey = false;
         if (utilMapIncludes.mapIncludes(ctx, map.items, keyNode))
           onError(keyStart, "DUPLICATE_KEY", "Map keys must be unique");
-        const valueProps = resolveProps.resolveProps(sep ?? [], {
+        const valueProps = resolveProps.resolveProps(sep2 ?? [], {
           indicator: "map-value-ind",
           next: value,
           offset: keyNode.range[2],
@@ -7424,7 +7424,7 @@ var require_resolve_block_map = __commonJS({
             if (ctx.options.strict && keyProps.start < valueProps.found.offset - 1024)
               onError(keyNode.range, "KEY_OVER_1024_CHARS", "The : indicator must be at most 1024 chars after the start of an implicit block mapping key");
           }
-          const valueNode = value ? composeNode(ctx, value, valueProps, onError) : composeEmptyNode(ctx, offset, sep, null, valueProps, onError);
+          const valueNode = value ? composeNode(ctx, value, valueProps, onError) : composeEmptyNode(ctx, offset, sep2, null, valueProps, onError);
           if (ctx.schema.compat)
             utilFlowIndentCheck.flowIndentCheck(bm.indent, value, onError);
           offset = valueNode.range[2];
@@ -7515,7 +7515,7 @@ var require_resolve_end = __commonJS({
       let comment = "";
       if (end) {
         let hasSpace = false;
-        let sep = "";
+        let sep2 = "";
         for (const token of end) {
           const { source, type } = token;
           switch (type) {
@@ -7529,13 +7529,13 @@ var require_resolve_end = __commonJS({
               if (!comment)
                 comment = cb;
               else
-                comment += sep + cb;
-              sep = "";
+                comment += sep2 + cb;
+              sep2 = "";
               break;
             }
             case "newline":
               if (comment)
-                sep += source;
+                sep2 += source;
               hasSpace = true;
               break;
             default:
@@ -7578,18 +7578,18 @@ var require_resolve_flow_collection = __commonJS({
       let offset = fc.offset + fc.start.source.length;
       for (let i = 0; i < fc.items.length; ++i) {
         const collItem = fc.items[i];
-        const { start, key, sep, value } = collItem;
+        const { start, key, sep: sep2, value } = collItem;
         const props = resolveProps.resolveProps(start, {
           flow: fcName,
           indicator: "explicit-key-ind",
-          next: key ?? sep?.[0],
+          next: key ?? sep2?.[0],
           offset,
           onError,
           parentIndent: fc.indent,
           startOnNewline: false
         });
         if (!props.found) {
-          if (!props.anchor && !props.tag && !sep && !value) {
+          if (!props.anchor && !props.tag && !sep2 && !value) {
             if (i === 0 && props.comma)
               onError(props.comma, "UNEXPECTED_TOKEN", `Unexpected , in ${fcName}`);
             else if (i < fc.items.length - 1)
@@ -7643,8 +7643,8 @@ var require_resolve_flow_collection = __commonJS({
             }
           }
         }
-        if (!isMap && !sep && !props.found) {
-          const valueNode = value ? composeNode(ctx, value, props, onError) : composeEmptyNode(ctx, props.end, sep, null, props, onError);
+        if (!isMap && !sep2 && !props.found) {
+          const valueNode = value ? composeNode(ctx, value, props, onError) : composeEmptyNode(ctx, props.end, sep2, null, props, onError);
           coll.items.push(valueNode);
           offset = valueNode.range[2];
           if (isBlock(value))
@@ -7656,7 +7656,7 @@ var require_resolve_flow_collection = __commonJS({
           if (isBlock(key))
             onError(keyNode.range, "BLOCK_IN_FLOW", blockMsg);
           ctx.atKey = false;
-          const valueProps = resolveProps.resolveProps(sep ?? [], {
+          const valueProps = resolveProps.resolveProps(sep2 ?? [], {
             flow: fcName,
             indicator: "map-value-ind",
             next: value,
@@ -7667,8 +7667,8 @@ var require_resolve_flow_collection = __commonJS({
           });
           if (valueProps.found) {
             if (!isMap && !props.found && ctx.options.strict) {
-              if (sep)
-                for (const st of sep) {
+              if (sep2)
+                for (const st of sep2) {
                   if (st === valueProps.found)
                     break;
                   if (st.type === "newline") {
@@ -7685,7 +7685,7 @@ var require_resolve_flow_collection = __commonJS({
             else
               onError(valueProps.start, "MISSING_CHAR", `Missing , or : between ${fcName} items`);
           }
-          const valueNode = value ? composeNode(ctx, value, valueProps, onError) : valueProps.found ? composeEmptyNode(ctx, valueProps.end, sep, null, valueProps, onError) : null;
+          const valueNode = value ? composeNode(ctx, value, valueProps, onError) : valueProps.found ? composeEmptyNode(ctx, valueProps.end, sep2, null, valueProps, onError) : null;
           if (valueNode) {
             if (isBlock(value))
               onError(valueNode.range, "BLOCK_IN_FLOW", blockMsg);
@@ -7865,7 +7865,7 @@ var require_resolve_block_scalar = __commonJS({
           chompStart = i + 1;
       }
       let value = "";
-      let sep = "";
+      let sep2 = "";
       let prevMoreIndented = false;
       for (let i = 0; i < contentStart; ++i)
         value += lines[i][0].slice(trimIndent) + "\n";
@@ -7882,24 +7882,24 @@ var require_resolve_block_scalar = __commonJS({
           indent = "";
         }
         if (type === Scalar.Scalar.BLOCK_LITERAL) {
-          value += sep + indent.slice(trimIndent) + content;
-          sep = "\n";
+          value += sep2 + indent.slice(trimIndent) + content;
+          sep2 = "\n";
         } else if (indent.length > trimIndent || content[0] === "	") {
-          if (sep === " ")
-            sep = "\n";
-          else if (!prevMoreIndented && sep === "\n")
-            sep = "\n\n";
-          value += sep + indent.slice(trimIndent) + content;
-          sep = "\n";
+          if (sep2 === " ")
+            sep2 = "\n";
+          else if (!prevMoreIndented && sep2 === "\n")
+            sep2 = "\n\n";
+          value += sep2 + indent.slice(trimIndent) + content;
+          sep2 = "\n";
           prevMoreIndented = true;
         } else if (content === "") {
-          if (sep === "\n")
+          if (sep2 === "\n")
             value += "\n";
           else
-            sep = "\n";
+            sep2 = "\n";
         } else {
-          value += sep + content;
-          sep = " ";
+          value += sep2 + content;
+          sep2 = " ";
           prevMoreIndented = false;
         }
       }
@@ -8082,25 +8082,25 @@ var require_resolve_flow_scalar = __commonJS({
         trimBoth = /^[ \t]+|[ \t]+$/g;
       }
       let res = match[1].replace(trimEnd, "");
-      let sep = " ";
+      let sep2 = " ";
       let pos = line.lastIndex;
       while (match = line.exec(source)) {
         const lm = match[1].replace(trimBoth, "");
         if (lm === "") {
-          if (sep === "\n")
-            res += sep;
+          if (sep2 === "\n")
+            res += sep2;
           else
-            sep = "\n";
+            sep2 = "\n";
         } else {
-          res += sep + lm;
-          sep = " ";
+          res += sep2 + lm;
+          sep2 = " ";
         }
         pos = line.lastIndex;
       }
       const last = /[ \t]*(.*)/sy;
       last.lastIndex = pos;
       match = last.exec(source);
-      return res + sep + (match?.[1] ?? "");
+      return res + sep2 + (match?.[1] ?? "");
     }
     function doubleQuotedValue(source, onError) {
       let res = "";
@@ -8910,14 +8910,14 @@ var require_cst_stringify = __commonJS({
         }
       }
     }
-    function stringifyItem({ start, key, sep, value }) {
+    function stringifyItem({ start, key, sep: sep2, value }) {
       let res = "";
       for (const st of start)
         res += st.source;
       if (key)
         res += stringifyToken(key);
-      if (sep)
-        for (const st of sep)
+      if (sep2)
+        for (const st of sep2)
           res += st.source;
       if (value)
         res += stringifyToken(value);
@@ -10084,18 +10084,18 @@ var require_parser = __commonJS({
         if (this.type === "map-value-ind") {
           const prev = getPrevProps(this.peek(2));
           const start = getFirstKeyStartProps(prev);
-          let sep;
+          let sep2;
           if (scalar.end) {
-            sep = scalar.end;
-            sep.push(this.sourceToken);
+            sep2 = scalar.end;
+            sep2.push(this.sourceToken);
             delete scalar.end;
           } else
-            sep = [this.sourceToken];
+            sep2 = [this.sourceToken];
           const map = {
             type: "block-map",
             offset: scalar.offset,
             indent: scalar.indent,
-            items: [{ start, key: scalar, sep }]
+            items: [{ start, key: scalar, sep: sep2 }]
           };
           this.onKeyLine = true;
           this.stack[this.stack.length - 1] = map;
@@ -10248,15 +10248,15 @@ var require_parser = __commonJS({
                 } else if (isFlowToken(it.key) && !includesToken(it.sep, "newline")) {
                   const start2 = getFirstKeyStartProps(it.start);
                   const key = it.key;
-                  const sep = it.sep;
-                  sep.push(this.sourceToken);
+                  const sep2 = it.sep;
+                  sep2.push(this.sourceToken);
                   delete it.key;
                   delete it.sep;
                   this.stack.push({
                     type: "block-map",
                     offset: this.offset,
                     indent: this.indent,
-                    items: [{ start: start2, key, sep }]
+                    items: [{ start: start2, key, sep: sep2 }]
                   });
                 } else if (start.length > 0) {
                   it.sep = it.sep.concat(start, this.sourceToken);
@@ -10450,13 +10450,13 @@ var require_parser = __commonJS({
             const prev = getPrevProps(parent);
             const start = getFirstKeyStartProps(prev);
             fixFlowSeqItems(fc);
-            const sep = fc.end.splice(1, fc.end.length);
-            sep.push(this.sourceToken);
+            const sep2 = fc.end.splice(1, fc.end.length);
+            sep2.push(this.sourceToken);
             const map = {
               type: "block-map",
               offset: fc.offset,
               indent: fc.indent,
-              items: [{ start, key: fc, sep }]
+              items: [{ start, key: fc, sep: sep2 }]
             };
             this.onKeyLine = true;
             this.stack[this.stack.length - 1] = map;
@@ -10753,8 +10753,12 @@ var {
 
 // src/cli/index.ts
 var import_picocolors2 = __toESM(require_picocolors(), 1);
-import { writeFileSync, existsSync as existsSync4 } from "node:fs";
+import { writeFileSync, existsSync as existsSync5, realpathSync as realpathSync2 } from "node:fs";
 import { resolve as resolve5 } from "node:path";
+import { fileURLToPath } from "node:url";
+
+// src/version.ts
+var PACKAGE_VERSION = "1.0.2";
 
 // src/config/loader.ts
 var import_yaml = __toESM(require_dist(), 1);
@@ -15015,10 +15019,10 @@ import { readdirSync, statSync, readFileSync as readFileSync2, realpathSync, exi
 import { join as join2, extname, relative as relative2, resolve as resolve3 } from "node:path";
 
 // src/utils/path-utils.ts
-import { resolve as resolve2, relative, normalize } from "node:path";
+import { resolve as resolve2, relative, normalize, isAbsolute, sep } from "node:path";
 function isPathInside(parentPath, targetPath) {
   const rel = relative(resolve2(parentPath), resolve2(targetPath));
-  return !rel.startsWith("..") && !rel.startsWith("/");
+  return rel === "" || rel !== ".." && !rel.startsWith(".." + sep) && !isAbsolute(rel);
 }
 function normalizeRelativePath(p) {
   const normalized = normalize(p).replace(/\\/g, "/");
@@ -15377,8 +15381,9 @@ var SecretScanner = class {
       }
     }
   }
-  scan(context) {
+  scan(context, options) {
     const results = [];
+    const untrackedFiles = options?.untrackedFiles;
     if (!this.config.enabled) {
       results.push({
         id: "SEC000",
@@ -15391,6 +15396,9 @@ var SecretScanner = class {
       return results;
     }
     for (const envFile of SENSITIVE_ENV_FILES) {
+      if (!this.config.includeUntracked && untrackedFiles?.has(normalizeRelativePath(envFile))) {
+        continue;
+      }
       if (context.hasFile(envFile)) {
         const content = context.readFile(envFile);
         if (content && content.trim().length > 0) {
@@ -15411,6 +15419,9 @@ var SecretScanner = class {
     }
     const maxBytes = this.config.maxFileSizeKb * 1024;
     for (const file of context.files) {
+      if (!this.config.includeUntracked && untrackedFiles?.has(normalizeRelativePath(file.relativePath))) {
+        continue;
+      }
       if (file.sizeBytes > maxBytes) {
         continue;
       }
@@ -15682,6 +15693,37 @@ function runStructureChecks(context, config) {
       });
     }
   }
+  if (config.checkReleaseNotes) {
+    const releaseNotesCandidates = [
+      "RELEASE_NOTES.md",
+      "release-notes.md",
+      "docs/RELEASE_NOTES.md",
+      ".github/RELEASE_NOTES.md"
+    ];
+    const foundReleaseNotes = releaseNotesCandidates.find((c) => context.hasFile(c));
+    if (foundReleaseNotes) {
+      results.push({
+        id: "STRUC-RELEASE-NOTES",
+        category: "structure",
+        name: "Release Notes Presence",
+        status: "pass",
+        severity: "info",
+        filePath: foundReleaseNotes,
+        message: `Release notes found at "${foundReleaseNotes}".`
+      });
+    } else {
+      results.push({
+        id: "STRUC-RELEASE-NOTES",
+        category: "structure",
+        name: "Release Notes Presence",
+        status: "fail",
+        severity: "warning",
+        filePath: "RELEASE_NOTES.md",
+        message: "No RELEASE_NOTES.md file found.",
+        remediation: "Add a RELEASE_NOTES.md file summarizing changes, upgrade notes, and known issues for the release."
+      });
+    }
+  }
   for (const reqFile of config.requiredFiles) {
     if (context.hasFile(reqFile)) {
       results.push({
@@ -15750,6 +15792,7 @@ function runDocumentationChecks(context, config) {
     "RELEASE_CHECKLIST.md"
   ];
   const filesToCheck = /* @__PURE__ */ new Set();
+  const requiredDocMap = new Map(config.requiredDocs.map((d) => [d.path, d]));
   for (const candidate of docCandidates) {
     if (context.hasFile(candidate)) {
       filesToCheck.add(candidate);
@@ -15773,9 +15816,10 @@ function runDocumentationChecks(context, config) {
       });
       continue;
     }
+    const reqDoc = requiredDocMap.get(filePath);
     const content = context.readFile(filePath);
     const size = context.getFileSize(filePath) ?? 0;
-    const minSize = config.minFileSizeBytes;
+    const minSize = reqDoc?.minSize ?? config.minFileSizeBytes;
     if (!content || content.trim().length === 0 || size < minSize) {
       results.push({
         id: `DOC-EMPTY-${filePath.replace(/[^a-zA-Z0-9]/g, "_")}`,
@@ -15791,11 +15835,30 @@ function runDocumentationChecks(context, config) {
       });
       continue;
     }
+    let hasIssue = false;
+    if (reqDoc?.title && !content.toLowerCase().includes(reqDoc.title.toLowerCase())) {
+      results.push({
+        id: `DOC-TITLE-${filePath.replace(/[^a-zA-Z0-9]/g, "_")}`,
+        category: "documentation",
+        name: `Documentation Title Check: ${filePath}`,
+        status: "fail",
+        severity: "error",
+        filePath,
+        line: 1,
+        column: 1,
+        message: `Documentation file "${filePath}" does not contain required title "${reqDoc.title}".`,
+        remediation: `Add the title or heading "${reqDoc.title}" to "${filePath}".`
+      });
+      hasIssue = true;
+    }
     if (config.disallowPlaceholders && config.placeholderPatterns.length > 0) {
-      const textToScan = filePath.endsWith(".md") ? content.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]+`/g, "") : content;
-      let foundPlaceholder = false;
+      const maskPreservingNewlines = (match) => match.replace(/[^\n]/g, " ");
+      const textToScan = filePath.endsWith(".md") ? content.replace(/```[\s\S]*?```/g, maskPreservingNewlines).replace(/`[^`\n]+`/g, maskPreservingNewlines) : content;
       for (const pattern of config.placeholderPatterns) {
-        const regex = new RegExp(`\\b${pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+        const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const prefix = /^\w/.test(pattern) ? "\\b" : "";
+        const suffix = /\w$/.test(pattern) ? "\\b" : "";
+        const regex = new RegExp(`${prefix}${escaped}${suffix}`, "i");
         const match = regex.exec(textToScan);
         if (match) {
           const loc = getLocationFromIndex(content, match.index);
@@ -15811,22 +15874,12 @@ function runDocumentationChecks(context, config) {
             message: `Unresolved placeholder "${match[0]}" found in "${filePath}" on line ${loc.line}: "${loc.lineSnippet}".`,
             remediation: `Review "${filePath}" and replace template placeholders with actual release documentation.`
           });
-          foundPlaceholder = true;
+          hasIssue = true;
           break;
         }
       }
-      if (!foundPlaceholder) {
-        results.push({
-          id: `DOC-VALID-${filePath.replace(/[^a-zA-Z0-9]/g, "_")}`,
-          category: "documentation",
-          name: `Documentation Content: ${filePath}`,
-          status: "pass",
-          severity: "info",
-          filePath,
-          message: `Documentation file "${filePath}" contains valid non-placeholder content (${size} bytes).`
-        });
-      }
-    } else {
+    }
+    if (!hasIssue) {
       results.push({
         id: `DOC-VALID-${filePath.replace(/[^a-zA-Z0-9]/g, "_")}`,
         category: "documentation",
@@ -15834,7 +15887,7 @@ function runDocumentationChecks(context, config) {
         status: "pass",
         severity: "info",
         filePath,
-        message: `Documentation file "${filePath}" is present and non-empty (${size} bytes).`
+        message: config.disallowPlaceholders ? `Documentation file "${filePath}" contains valid non-placeholder content (${size} bytes).` : `Documentation file "${filePath}" is present and non-empty (${size} bytes).`
       });
     }
   }
@@ -15843,6 +15896,58 @@ function runDocumentationChecks(context, config) {
 
 // src/utils/subprocess.ts
 import { spawn } from "node:child_process";
+import { existsSync as existsSync4 } from "node:fs";
+import { dirname, join as join3 } from "node:path";
+var SAFE_ENV_KEYS = [
+  "PATH",
+  "HOME",
+  "TMPDIR",
+  "TMP",
+  "TEMP",
+  "CI",
+  "NODE_ENV",
+  "SystemRoot",
+  "SYSTEMROOT",
+  "ComSpec",
+  "COMSPEC",
+  "USERPROFILE",
+  "APPDATA",
+  "LOCALAPPDATA",
+  "PATHEXT",
+  "NUMBER_OF_PROCESSORS"
+];
+function buildSafeEnv(extraEnv) {
+  const safeEnv = {};
+  for (const key of SAFE_ENV_KEYS) {
+    const val = process.env[key];
+    if (val !== void 0) {
+      safeEnv[key] = val;
+    }
+  }
+  if (!safeEnv.TMPDIR) {
+    safeEnv.TMPDIR = process.env.TMPDIR || process.env.TMP || "/tmp";
+  }
+  if (extraEnv) {
+    Object.assign(safeEnv, extraEnv);
+  }
+  return safeEnv;
+}
+function resolveCommand(command, args, shell) {
+  if (process.platform === "win32" && !shell && (command === "npm" || command === "npx")) {
+    const cliFile = command === "npm" ? "npm-cli.js" : "npx-cli.js";
+    const cliPath = join3(dirname(process.execPath), "node_modules", "npm", "bin", cliFile);
+    if (existsSync4(cliPath)) {
+      return {
+        executable: process.execPath,
+        spawnArgs: [cliPath, ...args]
+      };
+    }
+  }
+  return {
+    executable: command,
+    spawnArgs: args
+  };
+}
 async function executeSubprocess(command, args = [], options = {}) {
   const {
     cwd = process.cwd(),
@@ -15858,17 +15963,12 @@ async function executeSubprocess(command, args = [], options = {}) {
   let stderrBuffer = "";
   let stdoutTruncated = false;
   let stderrTruncated = false;
-  const safeEnv = {
-    PATH: process.env.PATH,
-    HOME: process.env.HOME,
-    TMPDIR: process.env.TMPDIR || process.env.TMP || "/tmp",
-    NODE_ENV: "test",
-    ...env
-  };
+  const safeEnv = buildSafeEnv(env);
+  const { executable, spawnArgs } = resolveCommand(command, args, shell);
   return new Promise((resolve6) => {
     let child;
     try {
-      child = spawn(command, args, {
+      child = spawn(executable, spawnArgs, {
         cwd,
         env: safeEnv,
         shell,
@@ -16020,6 +16120,17 @@ async function getCurrentGitBranch(cwd) {
     return result.stdout.trim();
   }
   return null;
+}
+async function getUntrackedGitFiles(cwd) {
+  const result = await executeSubprocess("git", ["ls-files", "--others", "--exclude-standard"], {
+    cwd,
+    timeoutMs: 1e4
+  });
+  if (result.exitCode !== 0) {
+    return /* @__PURE__ */ new Set();
+  }
+  const files = result.stdout.split(/\r?\n/).map((line) => line.trim()).filter((line) => line.length > 0).map((line) => normalizeRelativePath(line));
+  return new Set(files);
 }
 
 // src/checks/package.ts
@@ -16662,73 +16773,121 @@ function runChecklistChecks(context, config) {
     });
     return results;
   }
+  const completed = [];
+  const uncompleted = [];
   if (foundFile) {
     const content = context.readFile(foundFile);
-    if (!content) return results;
-    const taskRegex = /^[ \t]*-[ \t]*\[([ xX])\][ \t]*(.+)$/gm;
-    let match;
-    const completed = [];
-    const uncompleted = [];
-    while ((match = taskRegex.exec(content)) !== null) {
-      const isChecked = (match[1] ?? "").toLowerCase() === "x";
-      const taskText = (match[2] ?? "").trim();
-      const loc = getLocationFromIndex(content, match.index);
-      if (isChecked) {
-        completed.push(taskText);
-      } else {
-        uncompleted.push({ task: taskText, line: loc.line });
-      }
-    }
-    const totalTasks = completed.length + uncompleted.length;
-    if (totalTasks === 0) {
-      results.push({
-        id: "CHK-EMPTY",
-        category: "checklist",
-        name: "Release Checklist Verification",
-        status: "warn",
-        severity: "warning",
-        filePath: foundFile,
-        message: `Checklist file "${foundFile}" does not contain any Markdown task items (- [ ] / - [x]).`,
-        remediation: "Add markdown task items to track release verification steps."
-      });
-    } else if (uncompleted.length > 0 && config.requireAllCompleted) {
-      const pendingList = uncompleted.map((u) => `Line ${u.line}: ${u.task}`).join("; ");
-      results.push({
-        id: "CHK-PENDING-TASKS",
-        category: "checklist",
-        name: "Incomplete Release Checklist",
-        status: "fail",
-        severity: "error",
-        filePath: foundFile,
-        message: `${uncompleted.length} of ${totalTasks} release checklist tasks are not completed in "${foundFile}". Pending tasks: ${pendingList}`,
-        remediation: `Review "${foundFile}" and complete all remaining release checklist items before proceeding.`,
-        details: {
-          totalTasks,
-          completedCount: completed.length,
-          pendingTasks: uncompleted
+    if (content !== null) {
+      const taskRegex = /^[ \t]*-[ \t]*\[([ xX])\][ \t]*(.+)$/gm;
+      let match;
+      while ((match = taskRegex.exec(content)) !== null) {
+        const isChecked = (match[1] ?? "").toLowerCase() === "x";
+        const taskText = (match[2] ?? "").trim();
+        const loc = getLocationFromIndex(content, match.index);
+        if (isChecked) {
+          completed.push(taskText);
+        } else {
+          uncompleted.push({ task: taskText, line: loc.line });
         }
-      });
-    } else {
-      results.push({
-        id: "CHK-ALL-COMPLETED",
-        category: "checklist",
-        name: "Release Checklist Verification",
-        status: "pass",
-        severity: "info",
-        filePath: foundFile,
-        message: `All ${totalTasks} release checklist items in "${foundFile}" are marked complete.`
-      });
+      }
+      const totalTasks = completed.length + uncompleted.length;
+      if (totalTasks === 0) {
+        results.push({
+          id: "CHK-EMPTY",
+          category: "checklist",
+          name: "Release Checklist Verification",
+          status: "warn",
+          severity: "warning",
+          filePath: foundFile,
+          message: `Checklist file "${foundFile}" does not contain any Markdown task items (- [ ] / - [x]).`,
+          remediation: "Add markdown task items to track release verification steps."
+        });
+      } else if (uncompleted.length > 0 && config.requireAllCompleted) {
+        const pendingList = uncompleted.map((u) => `Line ${u.line}: ${u.task}`).join("; ");
+        results.push({
+          id: "CHK-PENDING-TASKS",
+          category: "checklist",
+          name: "Incomplete Release Checklist",
+          status: "fail",
+          severity: "error",
+          filePath: foundFile,
+          message: `${uncompleted.length} of ${totalTasks} release checklist tasks are not completed in "${foundFile}". Pending tasks: ${pendingList}`,
+          remediation: `Review "${foundFile}" and complete all remaining release checklist items before proceeding.`,
+          details: {
+            totalTasks,
+            completedCount: completed.length,
+            pendingTasks: uncompleted
+          }
+        });
+      } else {
+        results.push({
+          id: "CHK-ALL-COMPLETED",
+          category: "checklist",
+          name: "Release Checklist Verification",
+          status: "pass",
+          severity: "info",
+          filePath: foundFile,
+          message: `All ${totalTasks} release checklist items in "${foundFile}" are marked complete.`
+        });
+      }
     }
   }
   if (config.requiredItems.length > 0) {
     for (const item of config.requiredItems) {
+      const id = `CHK-REQ-ITEM-${item.replace(/[^a-zA-Z0-9]/g, "_")}`;
+      const name = `Required Checklist Item: ${item}`;
+      if (!foundFile) {
+        results.push({
+          id,
+          category: "checklist",
+          name,
+          status: "fail",
+          severity: "error",
+          message: `Required checklist item "${item}" could not be verified because no release checklist file was found.`,
+          remediation: `Create a RELEASE_CHECKLIST.md file containing a completed task item for "${item}".`
+        });
+        continue;
+      }
+      const normalizedItem = item.toLowerCase();
+      const isCompleted = completed.some((t) => t.toLowerCase().includes(normalizedItem));
+      if (isCompleted) {
+        results.push({
+          id,
+          category: "checklist",
+          name,
+          status: "pass",
+          severity: "info",
+          filePath: foundFile,
+          message: `Required release checklist item "${item}" is marked complete in "${foundFile}".`
+        });
+        continue;
+      }
+      const matchedUncompleted = uncompleted.find(
+        (u) => u.task.toLowerCase().includes(normalizedItem)
+      );
+      if (matchedUncompleted) {
+        results.push({
+          id,
+          category: "checklist",
+          name,
+          status: "fail",
+          severity: "error",
+          filePath: foundFile,
+          line: matchedUncompleted.line,
+          message: `Required checklist item "${item}" is present on line ${matchedUncompleted.line} of "${foundFile}" but is not marked complete.`,
+          remediation: `Complete the "${item}" item (- [x]) in "${foundFile}".`
+        });
+        continue;
+      }
       results.push({
-        id: `CHK-REQ-ITEM-${item.replace(/[^a-zA-Z0-9]/g, "_")}`,
+        id,
         category: "checklist",
-        name: `Required Checklist Item: ${item}`,
-        status: "pass",
-        severity: "info",
-        message: `Release checklist requirement verified: "${item}".`
+        name,
+        status: "fail",
+        severity: "error",
+        filePath: foundFile,
+        message: `Required checklist item "${item}" was not found in "${foundFile}".`,
+        remediation: `Add and complete a task item matching "${item}" in "${foundFile}".`
       });
     }
   }
@@ -16773,7 +16932,23 @@ function runCustomRules(context, rules) {
     const content = context.readFile(rule.file);
     if (!content) continue;
     if (rule.pattern) {
-      const regex = new RegExp(rule.pattern);
+      let regex;
+      try {
+        regex = new RegExp(rule.pattern);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({
+          id: rule.id,
+          category: "custom",
+          name: rule.name,
+          status: "fail",
+          severity: "error",
+          filePath: rule.file,
+          message: `Custom rule "${rule.name}" has invalid regex pattern "/${rule.pattern}/": ${msg}`,
+          remediation: `Fix the regular expression syntax in custom rule "${rule.id}".`
+        });
+        continue;
+      }
       if (!regex.test(content)) {
         results.push({
           id: rule.id,
@@ -16789,7 +16964,23 @@ function runCustomRules(context, rules) {
       }
     }
     if (rule.forbiddenPattern) {
-      const regex = new RegExp(rule.forbiddenPattern);
+      let regex;
+      try {
+        regex = new RegExp(rule.forbiddenPattern);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({
+          id: rule.id,
+          category: "custom",
+          name: rule.name,
+          status: "fail",
+          severity: "error",
+          filePath: rule.file,
+          message: `Custom rule "${rule.name}" has invalid forbiddenPattern "/${rule.forbiddenPattern}/": ${msg}`,
+          remediation: `Fix the regular expression syntax in custom rule "${rule.id}".`
+        });
+        continue;
+      }
       const match = regex.exec(content);
       if (match) {
         const loc = getLocationFromIndex(content, match.index);
@@ -16842,8 +17033,9 @@ var ReleaseReadinessEngine = class {
     allResults.push(...pkgResults);
     const scriptResults = await runScriptChecks(context, this.config.scripts);
     allResults.push(...scriptResults);
+    const untrackedFiles = this.config.secrets.enabled && !this.config.secrets.includeUntracked ? await getUntrackedGitFiles(context.workingDirectory) : void 0;
     const secretScanner = new SecretScanner(this.config.secrets);
-    allResults.push(...secretScanner.scan(context));
+    allResults.push(...secretScanner.scan(context, { untrackedFiles }));
     const depResults = await runDependencyChecks(context, this.config.dependencies);
     allResults.push(...depResults);
     const gitResults = await runGitChecks(context, this.config.git);
@@ -17145,12 +17337,12 @@ git:
 `;
 async function runCli() {
   const program2 = new Command();
-  program2.name("release-readiness").description("Evaluate software release-readiness before release or deployment").version("1.0.0").option("-c, --config <path>", "Path to configuration file (.release-readiness.yml or .json)").option("-d, --cwd <path>", "Working directory to evaluate", ".").option("--fail-on <level>", "Fail threshold: error, warning, or never", "error").option("--execute-scripts", "Execute configured scripts (safe opt-in)", false).option("--check-uncommitted", "Fail if git working tree has uncommitted changes", false).option("--no-secrets", "Disable secret scanning").option("--json", "Output report as JSON").option("--markdown", "Output report as Markdown").option("--init", "Generate a starter .release-readiness.yml config file");
+  program2.name("release-readiness").description("Evaluate software release-readiness before release or deployment").version(PACKAGE_VERSION).option("-c, --config <path>", "Path to configuration file (.release-readiness.yml or .json)").option("-d, --cwd <path>", "Working directory to evaluate", ".").option("--fail-on <level>", "Fail threshold: error, warning, or never (default: error)").option("--execute-scripts", "Execute configured scripts (safe opt-in)", false).option("--check-uncommitted", "Fail if git working tree has uncommitted changes", false).option("--no-secrets", "Disable secret scanning").option("--json", "Output report as JSON").option("--markdown", "Output report as Markdown").option("--init", "Generate a starter .release-readiness.yml config file");
   program2.parse(process.argv);
   const opts = program2.opts();
   if (opts.init) {
     const targetPath = resolve5(opts.cwd, ".release-readiness.yml");
-    if (existsSync4(targetPath)) {
+    if (existsSync5(targetPath)) {
       console.error(import_picocolors2.default.yellow(`Configuration file already exists at: ${targetPath}`));
       process.exit(1);
     }
@@ -17159,10 +17351,10 @@ async function runCli() {
     process.exit(0);
   }
   try {
-    const overrides = {
-      workingDirectory: opts.cwd,
-      failOn: opts.failOn
-    };
+    const overrides = {};
+    if (opts.failOn !== void 0) {
+      overrides.failOn = opts.failOn;
+    }
     if (opts.executeScripts) {
       overrides.scripts = { execute: true };
     }
@@ -17198,10 +17390,18 @@ async function runCli() {
     process.exit(2);
   }
 }
-if (import.meta.url === `file://${process.argv[1]}`) {
+function isExecutedDirectly() {
+  const argvPath = process.argv[1];
+  if (!argvPath) return false;
+  try {
+    return realpathSync2(fileURLToPath(import.meta.url)) === realpathSync2(resolve5(argvPath));
+  } catch {
+    return resolve5(fileURLToPath(import.meta.url)) === resolve5(argvPath);
+  }
+}
+if (isExecutedDirectly()) {
   runCli();
 }
 export {
   runCli
 };
-//# sourceMappingURL=cli.js.map

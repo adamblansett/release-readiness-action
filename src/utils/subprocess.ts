@@ -1,4 +1,6 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { truncateText } from './text.js';
 
 export interface SubprocessOptions {
@@ -18,6 +20,64 @@ export interface SubprocessResult {
   timedOut: boolean;
   durationMs: number;
   error?: Error;
+}
+
+const SAFE_ENV_KEYS = [
+  'PATH',
+  'HOME',
+  'TMPDIR',
+  'TMP',
+  'TEMP',
+  'CI',
+  'NODE_ENV',
+  'SystemRoot',
+  'SYSTEMROOT',
+  'ComSpec',
+  'COMSPEC',
+  'USERPROFILE',
+  'APPDATA',
+  'LOCALAPPDATA',
+  'PATHEXT',
+  'NUMBER_OF_PROCESSORS',
+] as const;
+
+function buildSafeEnv(extraEnv?: Record<string, string>): NodeJS.ProcessEnv {
+  const safeEnv: NodeJS.ProcessEnv = {};
+  for (const key of SAFE_ENV_KEYS) {
+    const val = process.env[key];
+    if (val !== undefined) {
+      safeEnv[key] = val;
+    }
+  }
+  if (!safeEnv.TMPDIR) {
+    safeEnv.TMPDIR = process.env.TMPDIR || process.env.TMP || '/tmp';
+  }
+  if (extraEnv) {
+    Object.assign(safeEnv, extraEnv);
+  }
+  return safeEnv;
+}
+
+function resolveCommand(
+  command: string,
+  args: string[],
+  shell: boolean,
+): { executable: string; spawnArgs: string[] } {
+  if (process.platform === 'win32' && !shell && (command === 'npm' || command === 'npx')) {
+    const cliFile = command === 'npm' ? 'npm-cli.js' : 'npx-cli.js';
+    const cliPath = join(dirname(process.execPath), 'node_modules', 'npm', 'bin', cliFile);
+    if (existsSync(cliPath)) {
+      return {
+        executable: process.execPath,
+        spawnArgs: [cliPath, ...args],
+      };
+    }
+  }
+
+  return {
+    executable: command,
+    spawnArgs: args,
+  };
 }
 
 /**
@@ -45,18 +105,13 @@ export async function executeSubprocess(
   let stderrTruncated = false;
 
   // Clean environment: inherit safe path and system vars, omit sensitive user env overrides
-  const safeEnv: NodeJS.ProcessEnv = {
-    PATH: process.env.PATH,
-    HOME: process.env.HOME,
-    TMPDIR: process.env.TMPDIR || process.env.TMP || '/tmp',
-    NODE_ENV: 'test',
-    ...env,
-  };
+  const safeEnv = buildSafeEnv(env);
+  const { executable, spawnArgs } = resolveCommand(command, args, shell);
 
   return new Promise((resolve) => {
     let child: ReturnType<typeof spawn>;
     try {
-      child = spawn(command, args, {
+      child = spawn(executable, spawnArgs, {
         cwd,
         env: safeEnv,
         shell,

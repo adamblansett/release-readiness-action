@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { ReleaseReadinessConfigSchema } from '../../src/config/schema.js';
 import { DEFAULT_CONFIG } from '../../src/config/defaults.js';
 import { deepMerge, loadConfig } from '../../src/config/loader.js';
-import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { writeFileSync, mkdirSync, rmSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { PACKAGE_VERSION } from '../../src/version.js';
 
 describe('Configuration System', () => {
   describe('Zod Schema Validation', () => {
@@ -126,6 +127,15 @@ structure:
           configPath: 'non-existent-config.yml',
         });
       }).toThrow(/Config file not found/);
+    });
+  });
+
+  describe('Package Version Synchronization', () => {
+    it('keeps PACKAGE_VERSION synchronized with package.json', () => {
+      const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8')) as {
+        version: string;
+      };
+      expect(PACKAGE_VERSION).toBe(pkg.version);
     });
   });
 });

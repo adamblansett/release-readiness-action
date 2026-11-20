@@ -50,7 +50,24 @@ export function runCustomRules(
     if (!content) continue;
 
     if (rule.pattern) {
-      const regex = new RegExp(rule.pattern);
+      let regex: RegExp;
+      try {
+        regex = new RegExp(rule.pattern);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({
+          id: rule.id,
+          category: 'custom',
+          name: rule.name,
+          status: 'fail',
+          severity: 'error',
+          filePath: rule.file,
+          message: `Custom rule "${rule.name}" has invalid regex pattern "/${rule.pattern}/": ${msg}`,
+          remediation: `Fix the regular expression syntax in custom rule "${rule.id}".`,
+        });
+        continue;
+      }
+
       if (!regex.test(content)) {
         results.push({
           id: rule.id,
@@ -69,7 +86,24 @@ export function runCustomRules(
     }
 
     if (rule.forbiddenPattern) {
-      const regex = new RegExp(rule.forbiddenPattern);
+      let regex: RegExp;
+      try {
+        regex = new RegExp(rule.forbiddenPattern);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({
+          id: rule.id,
+          category: 'custom',
+          name: rule.name,
+          status: 'fail',
+          severity: 'error',
+          filePath: rule.file,
+          message: `Custom rule "${rule.name}" has invalid forbiddenPattern "/${rule.forbiddenPattern}/": ${msg}`,
+          remediation: `Fix the regular expression syntax in custom rule "${rule.id}".`,
+        });
+        continue;
+      }
+
       const match = regex.exec(content);
       if (match) {
         const loc = getLocationFromIndex(content, match.index);

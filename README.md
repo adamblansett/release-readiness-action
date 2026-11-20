@@ -4,7 +4,7 @@ A configurable, language-agnostic GitHub Action and developer CLI that evaluates
 
 [![CI & Release Readiness](https://github.com/adamblansett/release-readiness-action/actions/workflows/ci.yml/badge.svg)](https://github.com/adamblansett/release-readiness-action/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-20+-brightgreen.svg)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-24+-brightgreen.svg)](https://nodejs.org)
 
 ---
 
@@ -47,12 +47,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
 
       - name: Install dependencies & build
@@ -74,6 +74,8 @@ jobs:
 
 ### Action Inputs
 
+Omitted inputs defer to your configuration file (`.release-readiness.yml` / `.release-readiness.json`) before falling back to the defaults below.
+
 | Input                | Description                                                               |    Default    | Required |
 | :------------------- | :------------------------------------------------------------------------ | :-----------: | :------: |
 | `config-path`        | Custom path to configuration file (`.release-readiness.yml` or `.json`)   | Auto-detected |    No    |
@@ -86,7 +88,7 @@ jobs:
 | `check-uncommitted`  | Verify working tree has no uncommitted changes                            |    `false`    |    No    |
 | `check-tag-version`  | Verify git tag ref matches package version (e.g. in release workflows)    |    `false`    |    No    |
 | `audit-dependencies` | Run dependency vulnerability audit (`npm audit`, requires network)        |    `false`    |    No    |
-| `output-format`      | Report output format: `all`, `markdown`, `json`, or `console`             |     `all`     |    No    |
+| `output-format`      | Report output format: `all`, `summary`, `markdown`, `json`, or `console`  |     `all`     |    No    |
 | `create-summary`     | Write GitHub Flavored Markdown summary to GitHub Actions Step Summary     |    `true`     |    No    |
 | `annotate-github`    | Emit inline annotations on GitHub Pull Request diffs for findings         |    `true`     |    No    |
 
@@ -196,6 +198,8 @@ reporting:
 ## 💻 Local Developer CLI
 
 Run release readiness evaluations locally before opening a pull request or pushing tags:
+
+> **Note:** Running via `npx release-readiness-action` requires the package to be published to npm. From a local clone, run `npm run build && node dist/cli.js` instead.
 
 ```bash
 # Evaluate current working directory using default rules

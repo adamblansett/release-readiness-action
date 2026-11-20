@@ -78,4 +78,34 @@ describe('Custom Rules', () => {
     expect(results.find((r) => r.id === 'CUST-PAT-01')?.status).toBe('pass');
     expect(results.find((r) => r.id === 'CUST-PAT-02')?.status).toBe('fail');
   });
+
+  it('reports invalid regex syntax as a failing check instead of throwing', () => {
+    const context = createMockContext({
+      'README.md': '# Hello',
+    });
+
+    const results = runCustomRules(context, [
+      {
+        id: 'CUST-BAD-01',
+        name: 'Broken Pattern',
+        file: 'README.md',
+        pattern: '[unclosed',
+        severity: 'error',
+      },
+      {
+        id: 'CUST-BAD-02',
+        name: 'Broken Forbidden Pattern',
+        file: 'README.md',
+        forbiddenPattern: '(unclosed',
+        severity: 'error',
+      },
+    ]);
+
+    expect(results.find((r) => r.id === 'CUST-BAD-01')?.status).toBe('fail');
+    expect(results.find((r) => r.id === 'CUST-BAD-01')?.message).toContain('invalid regex pattern');
+    expect(results.find((r) => r.id === 'CUST-BAD-02')?.status).toBe('fail');
+    expect(results.find((r) => r.id === 'CUST-BAD-02')?.message).toContain(
+      'invalid forbiddenPattern',
+    );
+  });
 });

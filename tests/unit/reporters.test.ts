@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { stripVTControlCharacters } from 'node:util';
 import { formatMarkdownReport } from '../../src/reporters/markdown-reporter.js';
 import { formatJsonReport } from '../../src/reporters/json-reporter.js';
 import { formatTerminalReport } from '../../src/reporters/terminal-reporter.js';
@@ -81,7 +82,7 @@ describe('Reporters', () => {
 
   describe('Terminal Reporter', () => {
     it('formats readable console output with section titles and summary counts', () => {
-      const term = formatTerminalReport(mockReport);
+      const term = stripVTControlCharacters(formatTerminalReport(mockReport));
 
       expect(term).toContain('RELEASE READINESS EVALUATION:');
       expect(term).toContain('FAILED');

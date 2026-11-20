@@ -200,5 +200,25 @@ export function getSecret(name: string) {
       const findings = scanner.scan(mockContext);
       expect(findings.filter((f) => f.status === 'fail')).toHaveLength(0);
     });
+
+    it('skips untracked files when includeUntracked is false', () => {
+      const untrackedScanner = new SecretScanner({
+        ...DEFAULT_CONFIG.secrets,
+        includeUntracked: false,
+      });
+
+      const mockContext = createMockContext({
+        '.env': 'SECRET_KEY=super_secret_value_123456',
+        'src/local-only.ts': 'const awsAccessKey = "AKIAIOSFODNN7EXAMPLE";',
+        'src/tracked.ts': 'export const ok = true;',
+      });
+
+      const findings = untrackedScanner.scan(mockContext, {
+        untrackedFiles: new Set(['.env', 'src/local-only.ts']),
+      });
+
+      expect(findings.filter((f) => f.status === 'fail')).toHaveLength(0);
+      expect(findings.some((f) => f.id === 'SEC-PASS-01')).toBe(true);
+    });
   });
 });

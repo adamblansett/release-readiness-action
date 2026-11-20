@@ -12,4 +12,3 @@ export declare class ReleaseReadinessEngine {
         customContext?: ReturnType<FileCollector['createContext']>;
     }): Promise<ReadinessReport>;
 }
-//# sourceMappingURL=engine.d.ts.map
