@@ -1,12 +1,12 @@
 {
-  "name": "release-readiness-action",
+  "name": "@adamblansett/release-readiness-action",
   "version": "1.0.2",
   "description": "Configurable GitHub Action and developer CLI to evaluate software release-readiness before release or deployment.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "release-readiness": "./dist/cli.js"
+    "release-readiness": "dist/cli.js"
   },
   "exports": {
     ".": {
@@ -21,6 +21,9 @@
     "LICENSE",
     "CHANGELOG.md"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "engines": {
     "node": ">=24.0.0"
   },

@@ -197,25 +197,41 @@ reporting:
 
 ## 💻 Local Developer CLI
 
-Run release readiness evaluations locally before opening a pull request or pushing tags:
+Run release readiness evaluations locally before opening a pull request or pushing tags.
 
-> **Note:** Running via `npx release-readiness-action` requires the package to be published to npm. From a local clone, run `npm run build && node dist/cli.js` instead.
+This package is published to **GitHub Packages** (`@adamblansett/release-readiness-action`). To install or run it via `npm` / `npx`, authenticate to GitHub Packages with a personal access token (`read:packages`) in your user `~/.npmrc` and ensure the `@adamblansett` scope points to GitHub's registry:
+
+```ini
+@adamblansett:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT
+```
+
+Then install globally or run with `npx`:
 
 ```bash
-# Evaluate current working directory using default rules
-npx release-readiness-action
+# Install globally (provides the `release-readiness` command)
+npm install -g @adamblansett/release-readiness-action
+
+# Or run directly with npx
+npx @adamblansett/release-readiness-action
 
 # Initialize a starter configuration file
-npx release-readiness-action --init
+npx @adamblansett/release-readiness-action --init
 
 # Evaluate with custom fail threshold
-npx release-readiness-action --fail-on warning
+npx @adamblansett/release-readiness-action --fail-on warning
 
 # Output JSON report
-npx release-readiness-action --json
+npx @adamblansett/release-readiness-action --json
 
 # Output Markdown summary
-npx release-readiness-action --markdown
+npx @adamblansett/release-readiness-action --markdown
+```
+
+From a local clone, you can also run the built CLI directly without publishing or registry auth:
+
+```bash
+npm run build && node dist/cli.js
 ```
 
 ---
