@@ -10758,7 +10758,7 @@ import { resolve as resolve5 } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // src/version.ts
-var PACKAGE_VERSION = "1.0.2";
+var PACKAGE_VERSION = "1.0.3";
 
 // src/config/loader.ts
 var import_yaml = __toESM(require_dist(), 1);

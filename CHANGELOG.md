@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-11-20
+
+### Changed
+
+- Scoped npm package name to `@adamblansett/release-readiness-action` with `publishConfig.registry` configured for GitHub Packages (`https://npm.pkg.github.com`) and added repository `.npmrc`.
+- Added `.github/workflows/publish-package.yml` to automate GitHub Packages publishing on published GitHub Releases and `workflow_dispatch`.
+- Updated `README.md` Local Developer CLI instructions for installing and running `@adamblansett/release-readiness-action` from GitHub Packages.
+
+### Fixed
+
+- Normalized `bin.release-readiness` in `package.json` from `./dist/cli.js` to `dist/cli.js` to eliminate npm publish warnings.
+
 ## [1.0.2] - 2026-11-19
 
 ### Changed

@@ -1,6 +1,6 @@
 {
   "name": "@adamblansett/release-readiness-action",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Configurable GitHub Action and developer CLI to evaluate software release-readiness before release or deployment.",
   "type": "module",
   "main": "./dist/index.js",

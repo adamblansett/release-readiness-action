@@ -1,5 +1,5 @@
 // src/version.ts
-var PACKAGE_VERSION = "1.0.2";
+var PACKAGE_VERSION = "1.0.3";
 
 // src/config/schema.ts
 import { z } from "zod";
