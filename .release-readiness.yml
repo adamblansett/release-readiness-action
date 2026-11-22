@@ -14,7 +14,7 @@ structure:
   checkChangelog: true
   checkSecurityPolicy: true
   checkContributing: true
-  checkCodeowners: false
+  checkCodeowners: true
   checkCiWorkflow: true
   checkReleaseNotes: false
   requiredFiles: []

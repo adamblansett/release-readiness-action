@@ -1,0 +1,46 @@
+name: Bug Report
+description: Report a defect in the GitHub Action or CLI
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what happened.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Steps, workflow snippet, or CLI command to reproduce the issue.
+      placeholder: |
+        1. Configure workflow or CLI command...
+        2. Run evaluation...
+        3. Observe unexpected result...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual behavior
+      description: What you expected to happen versus what actually happened.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Runtime / Runner OS
+      description: e.g. ubuntu-latest, windows-latest, Node 24, action tag v1 / v1.0.3
+      placeholder: 'ubuntu-latest / Node 24 / @v1'
+    validations:
+      required: false
+  - type: textarea
+    id: config
+    attributes:
+      label: Workflow or `.release-readiness.yml` snippet
+      description: Paste any relevant workflow YAML or configuration (redact sensitive values).
+      render: yaml
+    validations:
+      required: false

@@ -5,6 +5,7 @@ A configurable, language-agnostic GitHub Action and developer CLI that evaluates
 [![CI & Release Readiness](https://github.com/adamblansett/release-readiness-action/actions/workflows/ci.yml/badge.svg)](https://github.com/adamblansett/release-readiness-action/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-24+-brightgreen.svg)](https://nodejs.org)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Release%20Readiness%20Action-green?logo=github)](https://github.com/marketplace/actions/release-readiness-action)
 
 ---
 
