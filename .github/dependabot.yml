@@ -7,6 +7,24 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - 'dependencies'
+    groups:
+      eslint:
+        patterns:
+          - 'eslint'
+          - '@eslint/*'
+          - 'typescript-eslint'
+      vitest:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+      typescript:
+        patterns:
+          - 'typescript'
+          - '@types/*'
+    ignore:
+      # Held below 7.0.0 until typescript-eslint adds TypeScript 7 peer dependency support
+      - dependency-name: 'typescript'
+        versions: ['>=7.0.0']
 
   - package-ecosystem: 'github-actions'
     directory: '/'

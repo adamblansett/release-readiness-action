@@ -44,7 +44,7 @@ var ReleaseReadinessConfigSchema = z.object({
     checkReleaseNotes: z.boolean().default(false),
     requiredFiles: z.array(z.string().max(1024)).max(500).default([]),
     requiredDirectories: z.array(z.string().max(1024)).max(500).default([])
-  }).default({}),
+  }).prefault({}),
   documentation: z.object({
     minFileSizeBytes: z.number().int().nonnegative().default(20),
     disallowPlaceholders: z.boolean().default(true),
@@ -59,7 +59,7 @@ var ReleaseReadinessConfigSchema = z.object({
       "COMING SOON"
     ]),
     requiredDocs: z.array(RequiredDocSchema).max(500).default([])
-  }).default({}),
+  }).prefault({}),
   packageMetadata: z.object({
     enabled: z.boolean().default(true),
     requireName: z.boolean().default(true),
@@ -71,7 +71,7 @@ var ReleaseReadinessConfigSchema = z.object({
     validateEntryPoints: z.boolean().default(true),
     validateFilesWhitelist: z.boolean().default(true),
     checkTagVersionMatch: z.boolean().default(false)
-  }).default({}),
+  }).prefault({}),
   scripts: z.object({
     execute: z.boolean().default(false),
     requiredScripts: z.array(z.string().max(1024)).max(200).default([]),
@@ -79,7 +79,7 @@ var ReleaseReadinessConfigSchema = z.object({
     timeoutMs: z.number().int().positive().default(6e4),
     maxOutputBytes: z.number().int().positive().default(1048576)
     // 1MB
-  }).default({}),
+  }).prefault({}),
   secrets: z.object({
     enabled: z.boolean().default(true),
     maxFileSizeKb: z.number().int().positive().default(512),
@@ -107,30 +107,30 @@ var ReleaseReadinessConfigSchema = z.object({
     ]),
     includeUntracked: z.boolean().default(true),
     additionalPatterns: z.array(SecretPatternSchema).max(200).default([])
-  }).default({}),
+  }).prefault({}),
   dependencies: z.object({
     checkLockfile: z.boolean().default(true),
     checkMultipleLockfiles: z.boolean().default(true),
     audit: z.boolean().default(false),
     auditLevel: z.enum(["critical", "high", "moderate", "low"]).default("high")
-  }).default({}),
+  }).prefault({}),
   git: z.object({
     checkUncommitted: z.boolean().default(false),
     checkBranch: z.boolean().default(false),
     allowedBranches: z.array(z.string().max(1024)).max(100).default(["main", "master", "release/*"])
-  }).default({}),
+  }).prefault({}),
   checklist: z.object({
     checklistFile: z.string().optional(),
     requireAllCompleted: z.boolean().default(true),
     requiredItems: z.array(z.string().max(1024)).max(500).default([])
-  }).default({}),
+  }).prefault({}),
   reporting: z.object({
     format: z.enum(["all", "summary", "markdown", "json", "console"]).default("all"),
     summaryFile: z.string().optional(),
     jsonOutputFile: z.string().optional(),
     annotateGitHub: z.boolean().default(true),
     createSummary: z.boolean().default(true)
-  }).default({}),
+  }).prefault({}),
   customRules: z.array(CustomRuleSchema).max(500).default([])
 }).strict();
 
@@ -193,7 +193,9 @@ function loadConfig(options = {}) {
       }
     } catch (parseError) {
       const msg = parseError instanceof Error ? parseError.message : String(parseError);
-      throw new Error(`Failed to parse configuration file "${configFilePath}": ${msg}`);
+      throw new Error(`Failed to parse configuration file "${configFilePath}": ${msg}`, {
+        cause: parseError
+      });
     }
   }
   const baseConfig = { workingDirectory: cwd, ...rawFileConfig };
@@ -207,10 +209,11 @@ function loadConfig(options = {}) {
     };
   } catch (error2) {
     if (error2 instanceof ZodError) {
-      const issues = error2.issues.map((issue) => ` - ${issue.path.join(".")}: ${issue.message}`).join("\n");
+      const issues = error2.issues.map((issue) => ` - ${issue.path.map(String).join(".")}: ${issue.message}`).join("\n");
       throw new Error(
         `Configuration validation error in ${configFilePath || "options"}:
-${issues}`
+${issues}`,
+        { cause: error2 }
       );
     }
     throw error2;

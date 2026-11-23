@@ -49,7 +49,7 @@ export const ReleaseReadinessConfigSchema = z
         requiredFiles: z.array(z.string().max(1024)).max(500).default([]),
         requiredDirectories: z.array(z.string().max(1024)).max(500).default([]),
       })
-      .default({}),
+      .prefault({}),
 
     documentation: z
       .object({
@@ -70,7 +70,7 @@ export const ReleaseReadinessConfigSchema = z
           ]),
         requiredDocs: z.array(RequiredDocSchema).max(500).default([]),
       })
-      .default({}),
+      .prefault({}),
 
     packageMetadata: z
       .object({
@@ -85,7 +85,7 @@ export const ReleaseReadinessConfigSchema = z
         validateFilesWhitelist: z.boolean().default(true),
         checkTagVersionMatch: z.boolean().default(false),
       })
-      .default({}),
+      .prefault({}),
 
     scripts: z
       .object({
@@ -95,7 +95,7 @@ export const ReleaseReadinessConfigSchema = z
         timeoutMs: z.number().int().positive().default(60000),
         maxOutputBytes: z.number().int().positive().default(1048576), // 1MB
       })
-      .default({}),
+      .prefault({}),
 
     secrets: z
       .object({
@@ -129,7 +129,7 @@ export const ReleaseReadinessConfigSchema = z
         includeUntracked: z.boolean().default(true),
         additionalPatterns: z.array(SecretPatternSchema).max(200).default([]),
       })
-      .default({}),
+      .prefault({}),
 
     dependencies: z
       .object({
@@ -138,7 +138,7 @@ export const ReleaseReadinessConfigSchema = z
         audit: z.boolean().default(false),
         auditLevel: z.enum(['critical', 'high', 'moderate', 'low']).default('high'),
       })
-      .default({}),
+      .prefault({}),
 
     git: z
       .object({
@@ -149,7 +149,7 @@ export const ReleaseReadinessConfigSchema = z
           .max(100)
           .default(['main', 'master', 'release/*']),
       })
-      .default({}),
+      .prefault({}),
 
     checklist: z
       .object({
@@ -157,7 +157,7 @@ export const ReleaseReadinessConfigSchema = z
         requireAllCompleted: z.boolean().default(true),
         requiredItems: z.array(z.string().max(1024)).max(500).default([]),
       })
-      .default({}),
+      .prefault({}),
 
     reporting: z
       .object({
@@ -167,7 +167,7 @@ export const ReleaseReadinessConfigSchema = z
         annotateGitHub: z.boolean().default(true),
         createSummary: z.boolean().default(true),
       })
-      .default({}),
+      .prefault({}),
 
     customRules: z.array(CustomRuleSchema).max(500).default([]),
   })

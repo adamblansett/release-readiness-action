@@ -16,7 +16,7 @@ function createMockContext(files: Record<string, string>): EngineContext {
     files: collected,
     hasFile: (p) => Boolean(files[p]),
     readFile: (p) => files[p] ?? null,
-    readJson: <T>(p) => {
+    readJson: <T>(p: string) => {
       try {
         return files[p] ? (JSON.parse(files[p]!) as T) : null;
       } catch {

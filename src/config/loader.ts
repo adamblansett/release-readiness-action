@@ -29,10 +29,14 @@ const CANDIDATE_CONFIG_FILES = [
   'release-readiness.config.yml',
 ];
 
+export type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends Record<string, unknown> ? DeepPartial<T[K]> : T[K];
+};
+
 /**
  * Deeply merges two plain objects where override values take precedence.
  */
-export function deepMerge<T extends Record<string, unknown>>(base: T, override: Partial<T>): T {
+export function deepMerge<T extends Record<string, unknown>>(base: T, override: DeepPartial<T>): T {
   const result: Record<string, unknown> = { ...base };
 
   for (const key of Object.keys(override)) {
@@ -92,7 +96,9 @@ export function loadConfig(options: LoadConfigOptions = {}): LoadedConfigResult 
       }
     } catch (parseError: unknown) {
       const msg = parseError instanceof Error ? parseError.message : String(parseError);
-      throw new Error(`Failed to parse configuration file "${configFilePath}": ${msg}`);
+      throw new Error(`Failed to parse configuration file "${configFilePath}": ${msg}`, {
+        cause: parseError,
+      });
     }
   }
 
@@ -112,10 +118,11 @@ export function loadConfig(options: LoadConfigOptions = {}): LoadedConfigResult 
   } catch (error) {
     if (error instanceof ZodError) {
       const issues = error.issues
-        .map((issue) => ` - ${issue.path.join('.')}: ${issue.message}`)
+        .map((issue) => ` - ${issue.path.map(String).join('.')}: ${issue.message}`)
         .join('\n');
       throw new Error(
         `Configuration validation error in ${configFilePath || 'options'}:\n${issues}`,
+        { cause: error },
       );
     }
     throw error;
